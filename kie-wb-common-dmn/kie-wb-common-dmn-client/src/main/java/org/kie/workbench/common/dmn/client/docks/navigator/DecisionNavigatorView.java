@@ -18,11 +18,16 @@ package org.kie.workbench.common.dmn.client.docks.navigator;
 
 import javax.inject.Inject;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
+import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
+import org.kie.workbench.common.dmn.client.widgets.drd.controls.DRDContextMenu;
+import org.kie.workbench.common.dmn.client.widgets.drd.controls.DRDContextMenuViewImpl;
 
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.show;
@@ -39,15 +44,27 @@ public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
     @DataField("decision-components")
     private final HTMLDivElement decisionComponents;
 
+    @DataField("trigger-context-menu")
+    private final HTMLDivElement triggerContextMenu;
+
     private DecisionNavigatorPresenter presenter;
 
     @Inject
-    public DecisionNavigatorView(final HTMLDivElement mainTree,
+    public DecisionNavigatorView(final HTMLDivElement triggerContextMenu,
+                                 final HTMLDivElement mainTree,
                                  final HTMLDivElement decisionComponentsContainer,
                                  final HTMLDivElement decisionComponents) {
+        this.triggerContextMenu = triggerContextMenu;
         this.mainTree = mainTree;
         this.decisionComponentsContainer = decisionComponentsContainer;
         this.decisionComponents = decisionComponents;
+    }
+
+    @EventHandler("trigger-context-menu")
+    public void triggerContextMenu(final ClickEvent event) {
+        DRDContextMenu drdContextMenu = new DRDContextMenu(new DRDContextMenuViewImpl());
+        drdContextMenu.show();
+        DomGlobal.console.log("it should be showed");
     }
 
     @Override
