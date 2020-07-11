@@ -39,16 +39,30 @@ public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
     @DataField("decision-components")
     private final HTMLDivElement decisionComponents;
 
+    @DataField("trigger-context-menu")
+    private final HTMLDivElement triggerContextMenu;
+
+//    @Inject
+//    private DRDContextMenuView drdContextMenuView;
+
     private DecisionNavigatorPresenter presenter;
 
     @Inject
-    public DecisionNavigatorView(final HTMLDivElement mainTree,
+    public DecisionNavigatorView(final HTMLDivElement triggerContextMenu,
+                                 final HTMLDivElement mainTree,
                                  final HTMLDivElement decisionComponentsContainer,
                                  final HTMLDivElement decisionComponents) {
+        this.triggerContextMenu = triggerContextMenu;
         this.mainTree = mainTree;
         this.decisionComponentsContainer = decisionComponentsContainer;
         this.decisionComponents = decisionComponents;
     }
+
+//    @EventHandler("trigger-context-menu")
+//    public void triggerContextMenu(final ClickEvent event) {
+//        DomGlobal.console.log("it should be showed");
+//        mainTree.appendChild(drdContextMenuView.getElement());
+//    }
 
     @Override
     public void init(final DecisionNavigatorPresenter presenter) {
