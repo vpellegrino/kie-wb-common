@@ -63,6 +63,8 @@ public class TextAnnotation extends Artifact implements DMNViewDefinition<Genera
 
     protected boolean allowOnlyVisualChange;
 
+    private String dmnDiagramId;
+
     @Category
     private static final String stunnerCategory = Categories.NODES;
 
@@ -176,6 +178,14 @@ public class TextAnnotation extends Artifact implements DMNViewDefinition<Genera
 
     public void setTextFormat(final TextFormat textFormat) {
         this.textFormat = textFormat;
+    }
+
+    public String getDMNDiagramId() {
+        return dmnDiagramId;
+    }
+
+    public void setDMNDiagramId(final String dmnDiagramId) {
+        this.dmnDiagramId = dmnDiagramId;
     }
 
     @Override
