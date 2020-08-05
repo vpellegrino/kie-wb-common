@@ -172,6 +172,9 @@ public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
     private SearchBarComponent<DMNSearchableElement> searchBarComponent;
 
     @Mock
+    private DMNClientProjectDiagramService dmnClientProjectDiagramService;
+
+    @Mock
     private SearchBarComponent.View searchBarComponentView;
 
     @Mock
@@ -228,7 +231,7 @@ public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
                                                  (DMNEditorMenuSessionItems) getMenuSessionItems(),
                                                  projectMessagesListener,
                                                  translationService,
-                                                 clientProjectDiagramService,
+                                                 dmnClientProjectDiagramService,
                                                  projectDiagramResourceServiceCaller,
                                                  sessionManager,
                                                  sessionCommandManager,
