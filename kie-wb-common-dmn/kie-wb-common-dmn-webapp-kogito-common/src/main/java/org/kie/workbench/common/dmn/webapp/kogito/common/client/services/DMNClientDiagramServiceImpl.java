@@ -33,8 +33,8 @@ import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
 import org.kie.workbench.common.dmn.api.factory.DMNDiagramFactory;
 import org.kie.workbench.common.dmn.client.DMNShapeSet;
-import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.DMNMarshallerKogitoMarshaller;
-import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.DMNMarshallerKogitoUnmarshaller;
+import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
+import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12MarshallCallback;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12UnmarshallCallback;
@@ -72,8 +72,8 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
     //This path is needed by DiagramsNavigatorImpl's use of AbstractClientDiagramService.lookup(..) to retrieve a list of diagrams
     private static final String ROOT = "default://master@system/stunner/" + DIAGRAMS_PATH;
 
-    private DMNMarshallerKogitoUnmarshaller dmnMarshallerKogitoUnmarshaller;
-    private DMNMarshallerKogitoMarshaller dmnMarshallerKogitoMarshaller;
+    private DMNUnmarshaller dmnMarshallerKogitoUnmarshaller;
+    private DMNMarshaller dmnMarshallerKogitoMarshaller;
     private FactoryManager factoryManager;
     private DefinitionManager definitionManager;
     private DMNDiagramFactory dmnDiagramFactory;
@@ -84,8 +84,8 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
     }
 
     @Inject
-    public DMNClientDiagramServiceImpl(final DMNMarshallerKogitoUnmarshaller dmnMarshallerKogitoUnmarshaller,
-                                       final DMNMarshallerKogitoMarshaller dmnMarshallerKogitoMarshaller,
+    public DMNClientDiagramServiceImpl(final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller,
+                                       final DMNMarshaller dmnMarshallerKogitoMarshaller,
                                        final FactoryManager factoryManager,
                                        final DefinitionManager definitionManager,
                                        final DMNDiagramFactory dmnDiagramFactory,
