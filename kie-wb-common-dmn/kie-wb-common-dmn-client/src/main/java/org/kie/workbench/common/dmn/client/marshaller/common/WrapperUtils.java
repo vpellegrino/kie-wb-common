@@ -51,6 +51,7 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSIT
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITRelation;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITTextAnnotation;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNDecisionServiceDividerLine;
+import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNDiagram;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNEdge;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNLabel;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNShape;
@@ -62,10 +63,13 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
 
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getComposedId;
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getShapeId;
 import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.uniqueId;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.upperLeftBound;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.xOfBound;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.yOfBound;
+import static org.kie.workbench.common.stunner.core.util.StringUtils.isEmpty;
 
 /**
  * Class used to holds all common <b>wrapping</b> methods
@@ -174,10 +178,11 @@ public class WrapperUtils {
         return toReturn;
     }
 
-    public static JSIDMNShape getWrappedJSIDMNShape(final Definitions definitionsStunnerPojo,
+    public static JSIDMNShape getWrappedJSIDMNShape(final JSIDMNDiagram diagram,
+                                                    final Definitions definitionsStunnerPojo,
                                                     final View<? extends DMNElement> v,
                                                     final String namespaceURI) {
-        final JSIDMNShape unwrappedJSIDMNShape = stunnerToDDExt(definitionsStunnerPojo, v, namespaceURI);
+        final JSIDMNShape unwrappedJSIDMNShape = stunnerToDDExt(diagram, definitionsStunnerPojo, v, namespaceURI);
         final JSIDMNShape toReturn = Js.uncheckedCast(JsUtils.getWrappedElement(unwrappedJSIDMNShape));
         final JSIName jsiName = JSIDMNShape.getJSIName();
         updateJSIName(jsiName, "dmndi", "DMNShape");
@@ -218,16 +223,21 @@ public class WrapperUtils {
         toUpdate.setLocalPart(localPart);
         final String key = "{" + toUpdate.getNamespaceURI() + "}" + toUpdate.getLocalPart();
         toUpdate.setKey(key);
-        final String newPrefix = !StringUtils.isEmpty(toUpdate.getPrefix()) ? toUpdate.getPrefix() + ":" : "";
+        final String newPrefix = !isEmpty(toUpdate.getPrefix()) ? toUpdate.getPrefix() + ":" : "";
         final String string = "{" + toUpdate.getNamespaceURI() + "}" + newPrefix + toUpdate.getLocalPart();
         toUpdate.setString(string);
     }
 
-    private static JSIDMNShape stunnerToDDExt(final Definitions definitionsStunnerPojo,
+    private static JSIDMNShape stunnerToDDExt(final JSIDMNDiagram diagram,
+                                              final Definitions definitionsStunnerPojo,
                                               final View<? extends DMNElement> v,
                                               final String namespaceURI) {
         final JSIDMNShape result = new JSIDMNShape();
-        result.setId("dmnshape-" + uniqueId()); // check
+        final DMNElement definition = v.getDefinition();
+        final String dmnElementId = definition.getId().getValue();
+        final String shapeId = getShapeId(diagram, dmnElementId);
+
+        result.setId(shapeId);
         result.setDmnElementRef(getDmnElementRef(definitionsStunnerPojo, v, namespaceURI));
         final JSIBounds bounds = new JSIBounds();
         result.setBounds(bounds);

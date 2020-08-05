@@ -19,19 +19,22 @@ package org.kie.workbench.common.dmn.client.marshaller.common;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNDiagram;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
 import static org.kie.workbench.common.stunner.core.util.StringUtils.isEmpty;
 
 public class IdUtils {
 
-    private static String SEPARATOR = "#";
+    private static String SEPARATOR_DELIMITER = "#";
+
+    private static String COMBINER_DELIMITER = "-";
 
     public static String getPrefixedId(final String prefixId,
                                        final String rawId) {
         return Stream.of(prefixId, rawId)
                 .filter(s -> !isEmpty(s))
-                .collect(Collectors.joining(SEPARATOR));
+                .collect(Collectors.joining(SEPARATOR_DELIMITER));
     }
 
     public static String getRawId(final String prefixedId) {
@@ -39,7 +42,7 @@ public class IdUtils {
             return "";
         }
 
-        final String[] parts = prefixedId.split(SEPARATOR);
+        final String[] parts = prefixedId.split(SEPARATOR_DELIMITER);
 
         switch (parts.length) {
             case 1:
@@ -51,7 +54,28 @@ public class IdUtils {
         }
     }
 
+    public static String getComposedId(final String... parts) {
+        return Stream.of(parts)
+                .filter(s -> !isEmpty(s))
+                .map(s -> s.trim().replaceAll("\\s+", COMBINER_DELIMITER))
+                .collect(Collectors.joining(COMBINER_DELIMITER));
+    }
+
+    public static String getShapeId(final JSIDMNDiagram diagram,
+                                    final String dmnElementId) {
+        return getComposedId("dmnshape", lower(diagram.getName()), dmnElementId);
+    }
+
+    public static String getEdgeId(final JSIDMNDiagram diagram,
+                                   final String dmnElementId) {
+        return getComposedId("dmnedge", lower(diagram.getName()), dmnElementId);
+    }
+
     public static String uniqueId() {
         return UUID.uuid();
+    }
+
+    private static String lower(final String s) {
+        return s == null ? "" : s.toLowerCase();
     }
 }

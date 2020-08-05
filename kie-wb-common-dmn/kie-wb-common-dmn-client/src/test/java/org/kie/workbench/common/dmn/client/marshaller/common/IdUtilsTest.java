@@ -17,12 +17,18 @@
 package org.kie.workbench.common.dmn.client.marshaller.common;
 
 import org.junit.Test;
+import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNDiagram;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getComposedId;
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getEdgeId;
 import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getPrefixedId;
 import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getRawId;
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getShapeId;
 import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.uniqueId;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class IdUtilsTest {
 
@@ -43,5 +49,39 @@ public class IdUtilsTest {
     @Test
     public void testUniqueId() {
         assertNotEquals(uniqueId(), uniqueId());
+    }
+
+    @Test
+    public void testGetComposedId() {
+        assertEquals("dmnshape-page-1-_1111-2222", getComposedId("dmnshape", "page 1", "_1111-2222"));
+        assertEquals("dmnshape-page-1-_1111-2222", getComposedId("dmnshape", "page   1   ", "_1111-2222"));
+        assertEquals("dmnshape-_1111-2222", getComposedId("dmnshape", "", "_1111-2222"));
+        assertEquals("dmnshape-_1111-2222", getComposedId("dmnshape", "_1111-2222"));
+    }
+
+    @Test
+    public void testGetShapeId() {
+        final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
+        when(diagram.getName()).thenReturn("DRG");
+        assertEquals("dmnshape-drg-_1111-2222", getShapeId(diagram, "_1111-2222"));
+    }
+
+    @Test
+    public void testGetEdgeId() {
+        final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
+        when(diagram.getName()).thenReturn("DRG");
+        assertEquals("dmnedge-drg-_1111-2222", getEdgeId(diagram, "_1111-2222"));
+    }
+
+    @Test
+    public void testGetShapeIdWhenDiagramNameIsNull() {
+        final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
+        assertEquals("dmnshape-_1111-2222", getShapeId(diagram, "_1111-2222"));
+    }
+
+    @Test
+    public void testGetEdgeIdWhenDiagramNameIsNull() {
+        final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
+        assertEquals("dmnedge-_1111-2222", getEdgeId(diagram, "_1111-2222"));
     }
 }

@@ -51,6 +51,7 @@ public class DMNDiagramElementsUtils {
 
         if (dmnDiagrams.size() == 1) {
             renameDiagramElement(dmnDiagrams);
+            return;
         }
 
         final JSIDMNDiagram drg = generateDRGElement(dmnDefinitions);
@@ -77,10 +78,10 @@ public class DMNDiagramElementsUtils {
         drg.setName(DRG);
 
         forEach(dmnDefinitions.getDMNDI().getDMNDiagram(), dmnDiagram -> {
-            final List<JSIDiagramElement> dmnDiagramElements = dmnDiagram.getDMNDiagramElement();
+            final List<JSIDiagramElement> elements = dmnDiagram.getDMNDiagramElement();
             final double[] diagramOriginX = {globalOriginX[0]};
 
-            forEach(dmnDiagramElements, element -> {
+            forEach(elements, element -> {
                 final JSIDiagramElement copy = Js.uncheckedCast(jsCopy(element));
 
                 if (JSIDMNShape.instanceOf(copy)) {
