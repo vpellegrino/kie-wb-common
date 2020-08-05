@@ -21,8 +21,10 @@ import elemental2.dom.DOMTokenList;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
 import org.mockito.Mock;
@@ -34,7 +36,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public class DecisionNavigatorViewTest {
+
+    @Mock
+    private HTMLDivElement switchDRDs;
 
     @Mock
     private HTMLDivElement divMainTree;
@@ -51,11 +57,14 @@ public class DecisionNavigatorViewTest {
     @Mock
     private DecisionComponents.View decisionComponentsView;
 
+    @Mock
+    private DMNDiagramElementSwitcher switcher;
+
     private DecisionNavigatorView view;
 
     @Before
     public void setup() {
-        view = spy(new DecisionNavigatorView(divMainTree, decisionComponentsContainer, decisionComponents));
+        view = spy(new DecisionNavigatorView(switchDRDs, divMainTree, decisionComponentsContainer, decisionComponents, switcher));
     }
 
     @Test
