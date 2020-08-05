@@ -27,6 +27,7 @@ import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -98,6 +99,9 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
     private final Event<NotificationEvent> notificationEvent;
     private final DMNVFSService vfsService;
+
+    @Inject
+    private DMNDiagramElementSwitcher switcher;
 
     @Inject
     public DMNDiagramEditor(final View view,
@@ -219,6 +223,7 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
             decisionNavigatorDock.setupCanvasHandler(c);
             dataTypesPage.reload();
+            switcher.switchTo(switcher.getDMNDiagramElements().get(switcher.getDMNDiagramElements().size() - 1));
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });
     }
