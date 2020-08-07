@@ -23,6 +23,7 @@ import org.kie.workbench.common.dmn.api.definition.model.ItemDefinition;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedModel;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedNode;
 import org.kie.workbench.common.dmn.api.editors.included.IncludedModel;
+import org.kie.workbench.common.dmn.api.editors.included.PMMLDocumentMetadata;
 import org.kie.workbench.common.dmn.api.marshalling.DMNMarshallerImportsHelper;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDRGElement;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDefinitions;
@@ -31,10 +32,13 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSIT
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 
-public interface DMNMarshallerImportsHelperKogito extends DMNMarshallerImportsHelper<JSITImport, JSITDefinitions, JSITDRGElement, JSITItemDefinition> {
+public interface DMNMarshallerImportsClientHelper extends DMNMarshallerImportsHelper<JSITImport, JSITDefinitions, JSITDRGElement, JSITItemDefinition> {
 
     Promise<Map<JSITImport, JSITDefinitions>> getImportDefinitionsAsync(final Metadata metadata,
                                                                         final List<JSITImport> imports);
+
+    Promise<Map<JSITImport, PMMLDocumentMetadata>> getPMMLDocumentsAsync(final Metadata metadata,
+                                                                         final List<JSITImport> imports);
 
     void getImportedItemDefinitionsByNamespaceAsync(final String modelName,
                                                     final String namespace,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.webapp.kogito.common.client.converters;
+package org.kie.workbench.common.dmn.client.marshaller.unmarshall;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +24,9 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.dmn.client.marshaller.common.DMNDiagramElementsUtils;
+import org.kie.workbench.common.dmn.client.marshaller.included.DMNMarshallerImportsClientHelper;
+import org.kie.workbench.common.dmn.client.marshaller.unmarshall.nodes.NodeEntriesFactory;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDefinitions;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITImport;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
@@ -39,38 +42,51 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
-public class DMNMarshallerKogitoUnmarshallerTest {
+public class DMNUnmarshallerTest {
 
     @Mock
-    private DMNMarshallerImportsHelperKogito dmnMarshallerImportsHelperKogitoMock;
+    private FactoryManager factoryManager;
+
     @Mock
-    private FactoryManager factoryManagerMock;
+    private Metadata metadata;
+
     @Mock
-    private Metadata metadataMock;
+    private JSITDefinitions jsitDefinitions;
+
     @Mock
-    private JSITDefinitions jsitDefinitionsMock;
-    
-    private DMNMarshallerKogitoUnmarshaller dmnMarshallerKogitoUnmarshaller;
+    private DMNMarshallerImportsClientHelper dmnMarshallerImportsHelper;
+
+    @Mock
+    private NodeEntriesFactory modelToStunnerConverter;
+
+    @Mock
+    private DMNDiagramElementsUtils dmnDiagramElementsUtils;
+
+    private DMNUnmarshaller dmnUnmarshaller;
+
     private List<JSITImport> imports;
+
     private Promises promises;
 
     @Before
     public void setup() {
         promises = new SyncPromises();
-        dmnMarshallerKogitoUnmarshaller = new DMNMarshallerKogitoUnmarshaller(factoryManagerMock,
-                                                                              dmnMarshallerImportsHelperKogitoMock,
-                                                                              promises);
+        dmnUnmarshaller = new DMNUnmarshaller(factoryManager,
+                                              dmnMarshallerImportsHelper,
+                                              promises,
+                                              modelToStunnerConverter,
+                                              dmnDiagramElementsUtils);
         imports = new ArrayList<>();
         imports.add(mock(JSITImport.class));
-        when(jsitDefinitionsMock.getImport()).thenReturn(imports);
-        when(dmnMarshallerImportsHelperKogitoMock.getImportDefinitionsAsync(eq(metadataMock), eq(imports))).thenReturn(promises.resolve(Collections.emptyMap()));
-        when(dmnMarshallerImportsHelperKogitoMock.getPMMLDocumentsAsync(eq(metadataMock), eq(imports))).thenReturn(promises.resolve(Collections.emptyMap()));
+        when(jsitDefinitions.getImport()).thenReturn(imports);
+        when(dmnMarshallerImportsHelper.getImportDefinitionsAsync(eq(metadata), eq(imports))).thenReturn(promises.resolve(Collections.emptyMap()));
+        when(dmnMarshallerImportsHelper.getPMMLDocumentsAsync(eq(metadata), eq(imports))).thenReturn(promises.resolve(Collections.emptyMap()));
     }
 
     @Test
     public void unmarshall() {
-        dmnMarshallerKogitoUnmarshaller.unmarshall(metadataMock, jsitDefinitionsMock);
-        verify(dmnMarshallerImportsHelperKogitoMock, times(1)).getImportDefinitionsAsync(eq(metadataMock), eq(imports));
-        verify(dmnMarshallerImportsHelperKogitoMock, times(1)).getPMMLDocumentsAsync(eq(metadataMock), eq(imports));
+        dmnUnmarshaller.unmarshall(metadata, jsitDefinitions);
+        verify(dmnMarshallerImportsHelper, times(1)).getImportDefinitionsAsync(eq(metadata), eq(imports));
+        verify(dmnMarshallerImportsHelper, times(1)).getPMMLDocumentsAsync(eq(metadata), eq(imports));
     }
 }

@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.model;
+
+package org.kie.workbench.common.dmn.client.marshaller.converters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,5 +145,4 @@ public class ImportConverterTest {
         assertNotNull(resultImport.getId().getValue());
         assertEquals(0, ((ImportPMML) resultImport).getModelCount());
     }
-
 }

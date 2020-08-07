@@ -29,7 +29,7 @@ import javax.inject.Inject;
 
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.HasComponentWidths;
-import org.kie.workbench.common.dmn.client.marshaller.included.DMNMarshallerImportsHelperKogito;
+import org.kie.workbench.common.dmn.client.marshaller.included.DMNMarshallerImportsClientHelper;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.di.JSIDiagramElement;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITArtifact;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITAssociation;
@@ -50,12 +50,12 @@ public class NodeEntriesFactory {
 
     private final NodeConnector nodeConnector;
 
-    private final DMNMarshallerImportsHelperKogito dmnMarshallerImportsHelper;
+    private final DMNMarshallerImportsClientHelper dmnMarshallerImportsHelper;
 
     @Inject
     public NodeEntriesFactory(final StunnerConverter nodeFactory,
                               final NodeConnector nodeConnector,
-                              final DMNMarshallerImportsHelperKogito dmnMarshallerImportsHelper) {
+                              final DMNMarshallerImportsClientHelper dmnMarshallerImportsHelper) {
         this.nodeFactory = nodeFactory;
         this.nodeConnector = nodeConnector;
         this.dmnMarshallerImportsHelper = dmnMarshallerImportsHelper;

@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.workbench.common.dmn.webapp.kogito.common.client.services;
+
+package org.kie.workbench.common.dmn.client.marshaller.included;
 
 import elemental2.promise.Promise;
 import org.junit.Assert;
@@ -44,7 +45,7 @@ public class PMMLMarshallerServiceTest {
 
     @Test
     public void getDocumentMetadata() {
-        Promise<PMMLDocumentMetadata> returnPromise = pmmlMarshallerService.getDocumentMetadata(PATH, CONTENT);
+        final Promise<PMMLDocumentMetadata> returnPromise = pmmlMarshallerService.getDocumentMetadata(PATH, CONTENT);
         assertNotNull(returnPromise);
         returnPromise.then(pmmlDocumentMetadata -> {
             assertNotNull(pmmlDocumentMetadata);
@@ -79,7 +80,7 @@ public class PMMLMarshallerServiceTest {
     }
 
     public void getDocumentMetadataInvalidContent(String pmmlFile, String pmmlFileContent, String expectedMessage) {
-        Promise<PMMLDocumentMetadata> returnPromise = pmmlMarshallerService.getDocumentMetadata(pmmlFile, pmmlFileContent);
+        final Promise<PMMLDocumentMetadata> returnPromise = pmmlMarshallerService.getDocumentMetadata(pmmlFile, pmmlFileContent);
         assertNotNull(returnPromise);
         returnPromise.then(i -> {
             Assert.fail("Promise should've been resolved!");

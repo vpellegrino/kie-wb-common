@@ -41,7 +41,7 @@ import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.converters.DefinitionsConverter;
 import org.kie.workbench.common.dmn.client.marshaller.converters.ItemDefinitionPropertyConverter;
 import org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils;
-import org.kie.workbench.common.dmn.client.marshaller.included.DMNMarshallerImportsHelperKogito;
+import org.kie.workbench.common.dmn.client.marshaller.included.DMNMarshallerImportsClientHelper;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.nodes.NodeEntriesFactory;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.nodes.NodeEntry;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
@@ -73,7 +73,7 @@ public class DMNUnmarshaller {
 
     private final FactoryManager factoryManager;
 
-    private final DMNMarshallerImportsHelperKogito dmnMarshallerImportsHelper;
+    private final DMNMarshallerImportsClientHelper dmnMarshallerImportsHelper;
 
     private Promises promises;
 
@@ -87,7 +87,7 @@ public class DMNUnmarshaller {
 
     @Inject
     public DMNUnmarshaller(final FactoryManager factoryManager,
-                           final DMNMarshallerImportsHelperKogito dmnMarshallerImportsHelper,
+                           final DMNMarshallerImportsClientHelper dmnMarshallerImportsHelper,
                            final Promises promises,
                            final NodeEntriesFactory modelToStunnerConverter,
                            final DMNDiagramElementsUtils dmnDiagramElementsUtils) {
@@ -107,20 +107,27 @@ public class DMNUnmarshaller {
                                      final JSITDefinitions jsiDefinitions) {
 
         return getImportDefinitions(metadata, jsiDefinitions)
-                .then(importDefinitions -> unmarshall(metadata,
-                                                      jsiDefinitions,
-                                                      importDefinitions));
+                .then(importDefinitions -> getPMMLDocuments(metadata, jsiDefinitions)
+                        .then(pmmlDocumentMetadata -> unmarshall(metadata,
+                                                                 jsiDefinitions,
+                                                                 importDefinitions,
+                                                                 pmmlDocumentMetadata)));
     }
 
-    private Promise<Map<JSITImport, JSITDefinitions>> getImportDefinitions(final Metadata metadata,
-                                                                           final JSITDefinitions jsiDefinitions) {
+    Promise<Map<JSITImport, JSITDefinitions>> getImportDefinitions(final Metadata metadata,
+                                                                   final JSITDefinitions jsiDefinitions) {
         final List<JSITImport> imports = jsiDefinitions.getImport();
         return dmnMarshallerImportsHelper.getImportDefinitionsAsync(metadata, imports);
     }
 
+    Promise<Map<JSITImport, PMMLDocumentMetadata>> getPMMLDocuments(final Metadata metadata, final JSITDefinitions jsiDefinitions) {
+        return dmnMarshallerImportsHelper.getPMMLDocumentsAsync(metadata, jsiDefinitions.getImport());
+    }
+
     private Promise<Graph> unmarshall(final Metadata metadata,
                                       final JSITDefinitions dmnDefinitions,
-                                      final Map<JSITImport, JSITDefinitions> importDefinitions) {
+                                      final Map<JSITImport, JSITDefinitions> importDefinitions,
+                                      Map<JSITImport, PMMLDocumentMetadata> pmmlDocuments) {
 
         final Map<String, HasComponentWidths> hasComponentWidthsMap = new HashMap<>();
         final BiConsumer<String, HasComponentWidths> hasComponentWidthsConsumer = (uuid, hcw) -> {
@@ -128,9 +135,6 @@ public class DMNUnmarshaller {
                 hasComponentWidthsMap.put(uuid, hcw);
             }
         };
-
-        // Get external PMML model information
-        final Map<JSITImport, PMMLDocumentMetadata> pmmlDocuments = getPmmlDocuments(metadata, dmnDefinitions);
 
         ensureDRGElementExists(dmnDefinitions);
 
@@ -223,10 +227,6 @@ public class DMNUnmarshaller {
                     return jsitDecisionService;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private Map<JSITImport, PMMLDocumentMetadata> getPmmlDocuments(final Metadata metadata, final JSITDefinitions jsiDefinitions) {
-        return dmnMarshallerImportsHelper.getPMMLDocuments(metadata, jsiDefinitions.getImport());
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

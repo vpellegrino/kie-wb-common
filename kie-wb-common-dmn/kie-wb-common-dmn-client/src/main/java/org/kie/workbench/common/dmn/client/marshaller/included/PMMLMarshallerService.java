@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.workbench.common.dmn.webapp.kogito.common.client.services;
+
+package org.kie.workbench.common.dmn.client.marshaller.included;
 
 import java.util.Collections;
 
@@ -53,11 +54,11 @@ public class PMMLMarshallerService {
         }
 
         /* Here, a JSInterop call through enveloper should be used passing pmmlFileContent */
-        String pmmlFileName = FileUtils.getFileName(pmmlFile);
-        PMMLDocumentMetadata documentMetadata = new PMMLDocumentMetadata(pmmlFile,
-                                                                         pmmlFileName,
-                                                                         DMNImportTypes.PMML.getDefaultNamespace(),
-                                                                         Collections.emptyList());
+        final String pmmlFileName = FileUtils.getFileName(pmmlFile);
+        final PMMLDocumentMetadata documentMetadata = new PMMLDocumentMetadata(pmmlFile,
+                                                                               pmmlFileName,
+                                                                               DMNImportTypes.PMML.getDefaultNamespace(),
+                                                                               Collections.emptyList());
         return promises.resolve(documentMetadata);
     }
 }
