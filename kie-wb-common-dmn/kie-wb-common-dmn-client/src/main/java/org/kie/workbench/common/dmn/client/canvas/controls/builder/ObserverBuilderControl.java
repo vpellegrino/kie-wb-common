@@ -16,7 +16,7 @@
 
 package org.kie.workbench.common.dmn.client.canvas.controls.builder;
 
-import java.util.Objects;
+import java.util.Optional;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -26,11 +26,12 @@ import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.dmn.api.definition.HasVariable;
 import org.kie.workbench.common.dmn.api.definition.model.BusinessKnowledgeModel;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DMNElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.factory.DefaultCanvasCommandFactory;
-import org.kie.workbench.common.dmn.client.docks.navigator.GraphDRDSwitchPOC;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.forms.adf.definitions.DynamicReadOnly;
 import org.kie.workbench.common.stunner.core.client.api.ClientDefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.impl.Observer;
@@ -48,7 +49,7 @@ import org.kie.workbench.common.stunner.core.util.StringUtils;
 @Observer
 public class ObserverBuilderControl extends org.kie.workbench.common.stunner.core.client.canvas.controls.builder.impl.ObserverBuilderControl {
 
-    private final GraphDRDSwitchPOC graphDRDSwitchPOC;
+    private final DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
 
     @Inject
     public ObserverBuilderControl(final ClientDefinitionManager clientDefinitionManager,
@@ -58,7 +59,7 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
                                   final ClientTranslationMessages translationMessages,
                                   final GraphBoundsIndexer graphBoundsIndexer,
                                   final Event<CanvasSelectionEvent> canvasSelectionEvent,
-                                  final GraphDRDSwitchPOC graphDRDSwitchPOC) {
+                                  final DMNDiagramElementSwitcher dmnDiagramElementSwitcher) {
         super(clientDefinitionManager,
               clientFactoryServices,
               ruleManager,
@@ -66,7 +67,7 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
               translationMessages,
               graphBoundsIndexer,
               canvasSelectionEvent);
-        this.graphDRDSwitchPOC = graphDRDSwitchPOC;
+        this.dmnDiagramElementSwitcher = dmnDiagramElementSwitcher;
     }
 
     @Override
@@ -107,12 +108,14 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
             }
         }
 
-        if (newDefinition instanceof DRGElement && !Objects.isNull(getGraphDRDSwitchPOC().getSelectedDMNDiagram())) {
-            ((DRGElement) newDefinition).setDmnDiagramId(getGraphDRDSwitchPOC().getSelectedDMNDiagram().getId().getValue());
+        final Optional<DMNDiagramElement> currentDMNDiagramElement = getDMNDiagramElementSwitcher().getCurrentDMNDiagramElement();
+
+        if (currentDMNDiagramElement.isPresent() && newDefinition instanceof DRGElement) {
+            ((DRGElement) newDefinition).setDMNDiagramId(currentDMNDiagramElement.get().getId().getValue());
         }
     }
 
-    public GraphDRDSwitchPOC getGraphDRDSwitchPOC() {
-        return graphDRDSwitchPOC;
+    DMNDiagramElementSwitcher getDMNDiagramElementSwitcher() {
+        return dmnDiagramElementSwitcher;
     }
 }

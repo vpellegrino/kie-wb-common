@@ -30,6 +30,7 @@ import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
@@ -107,6 +108,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
 @WithClassesToStub(PathPlaceRequest.class)
+@Ignore
 public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
 
     @Mock

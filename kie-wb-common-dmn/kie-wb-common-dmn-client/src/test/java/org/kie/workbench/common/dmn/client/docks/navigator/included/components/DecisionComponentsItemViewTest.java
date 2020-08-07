@@ -192,6 +192,7 @@ public class DecisionComponentsItemViewTest {
         when(clientTranslationService.getValue(DecisionComponentsItemView_DuplicatedNode)).thenReturn(expectedWarnMessage);
         doReturn(graph).when(view).getGraph();
 
+        view.setIsImported(true);
         view.makeDragProxyCallbackImpl(drgElement, factory).onComplete(x, y);
 
         verify(buildCanvasShapeEvent, never()).fire(any());

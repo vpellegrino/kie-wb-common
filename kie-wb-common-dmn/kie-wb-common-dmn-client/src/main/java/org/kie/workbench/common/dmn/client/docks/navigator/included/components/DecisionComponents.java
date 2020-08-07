@@ -38,7 +38,7 @@ import org.kie.workbench.common.dmn.api.editors.included.DMNImportTypes;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedModel;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedNode;
 import org.kie.workbench.common.dmn.client.api.included.legacy.DMNIncludeModelsClient;
-import org.kie.workbench.common.dmn.client.docks.navigator.GraphDRDSwitchPOC;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -65,7 +65,7 @@ public class DecisionComponents {
 
     private final DMNGraphUtils dmnGraphUtils;
 
-    private final GraphDRDSwitchPOC graphDRDSwitchPOC;
+    private final DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
 
     @Inject
     public DecisionComponents(final View view,
@@ -74,14 +74,14 @@ public class DecisionComponents {
                               final ManagedInstance<DecisionComponentsItem> itemManagedInstance,
                               final DecisionComponentFilter filter,
                               final DMNGraphUtils dmnGraphUtils,
-                              final GraphDRDSwitchPOC graphDRDSwitchPOC) {
+                              final DMNDiagramElementSwitcher dmnDiagramElementSwitcher) {
         this.view = view;
         this.graphUtils = graphUtils;
         this.client = client;
         this.itemManagedInstance = itemManagedInstance;
         this.filter = filter;
         this.dmnGraphUtils = dmnGraphUtils;
-        this.graphDRDSwitchPOC = graphDRDSwitchPOC;
+        this.dmnDiagramElementSwitcher = dmnDiagramElementSwitcher;
     }
 
     @PostConstruct
@@ -104,7 +104,7 @@ public class DecisionComponents {
     }
 
     void loadDRDComponents() {
-        for (final DMNDiagramElement diagramElement : graphDRDSwitchPOC.getDRDs()) {
+        for (final DMNDiagramElement diagramElement : dmnDiagramElementSwitcher.getDMNDiagramElements()) {
             loadDRDComponentsFromDiagram(diagramElement);
         }
     }
@@ -115,14 +115,21 @@ public class DecisionComponents {
         final Stream<Node> nodeStream = dmnGraphUtils.getNodeStream();
         final List<DecisionComponent> decisionComponents = new ArrayList<>();
 
-        nodeStream.filter(node -> definitionContainsDRGElement(node))
+        nodeStream.filter(this::definitionContainsDRGElement)
                 .forEach((Node node) -> {
-                    final DRGElement drgElement = (DRGElement) ((Definition) node.getContent()).getDefinition();
-                    final String dmnDiagramId = drgElement.getDmnDiagramId();
-                    if (Objects.equals(dmnDiagramId, drdId)) {
-                        final DecisionComponent decisionComponent = makeDecisionComponent(dmnDiagramId,
-                                                                                          drgElement);
-                        decisionComponents.add(decisionComponent);
+                    final Object content = node.getContent();
+                    if (content instanceof Definition) {
+                        final Object definition = ((Definition) content).getDefinition();
+                        if (definition instanceof DRGElement) {
+                            final DRGElement drgElement = (DRGElement) definition;
+                            final String dmnDiagramId = drgElement.getDMNDiagramId();
+
+                            if (Objects.equals(dmnDiagramId, drdId)) {
+                                final DecisionComponent decisionComponent = makeDecisionComponent(dmnDiagramId,
+                                                                                                  drgElement);
+                                decisionComponents.add(decisionComponent);
+                            }
+                        }
                     }
                 });
 

@@ -41,7 +41,7 @@ import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.LocationURI;
 import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.client.api.included.legacy.DMNIncludeModelsClient;
-import org.kie.workbench.common.dmn.client.docks.navigator.GraphDRDSwitchPOC;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -89,7 +89,7 @@ public class DecisionComponentsTest {
     private DMNGraphUtils dmnGraphUtils;
 
     @Mock
-    private GraphDRDSwitchPOC graphDRDSwitchPOC;
+    private DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
 
     @Captor
     private ArgumentCaptor<List<DecisionComponent>> decisionComponentListCaptor;
@@ -99,7 +99,7 @@ public class DecisionComponentsTest {
     @Before
     public void setup() {
 
-        decisionComponents = spy(new DecisionComponents(view, graphUtils, client, itemManagedInstance, filter, dmnGraphUtils, graphDRDSwitchPOC));
+        decisionComponents = spy(new DecisionComponents(view, graphUtils, client, itemManagedInstance, filter, dmnGraphUtils, dmnDiagramElementSwitcher));
     }
 
     @Test
@@ -351,8 +351,8 @@ public class DecisionComponentsTest {
         when(node2.getContent()).thenReturn(node2Content);
         when(node1Content.getDefinition()).thenReturn(node1DRGElement);
         when(node2Content.getDefinition()).thenReturn(node2DRGElement);
-        when(node1DRGElement.getDmnDiagramId()).thenReturn(id);
-        when(node2DRGElement.getDmnDiagramId()).thenReturn(id);
+        when(node1DRGElement.getDMNDiagramId()).thenReturn(id);
+        when(node2DRGElement.getDMNDiagramId()).thenReturn(id);
         doReturn(decisionComponent1).when(decisionComponents).makeDecisionComponent(id, node1DRGElement);
         doReturn(decisionComponent2).when(decisionComponents).makeDecisionComponent(id, node2DRGElement);
         when(view.getComponentsCounter()).thenReturn(existingComponentsCounter);

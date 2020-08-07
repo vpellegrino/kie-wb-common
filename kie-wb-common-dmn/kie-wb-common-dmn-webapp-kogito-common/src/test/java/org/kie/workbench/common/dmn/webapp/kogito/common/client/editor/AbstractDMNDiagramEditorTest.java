@@ -20,6 +20,7 @@ import elemental2.dom.HTMLElement;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
@@ -103,6 +104,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public abstract class AbstractDMNDiagramEditorTest {
 
     protected static final String CONTENT = "content";

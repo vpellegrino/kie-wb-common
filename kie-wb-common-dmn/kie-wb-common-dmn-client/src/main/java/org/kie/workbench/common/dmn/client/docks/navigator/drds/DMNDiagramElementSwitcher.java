@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,12 +22,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.TextAnnotation;
+import org.kie.workbench.common.dmn.client.docks.navigator.SelectedDMNDiagramElementEvent;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvasView;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
@@ -45,14 +47,24 @@ public class DMNDiagramElementSwitcher {
 
     private final DMNGraphUtils dmnGraphUtils;
 
+    private final Event<SelectedDMNDiagramElementEvent> drdSelectedEvent;
+
+    private DMNDiagramElement currentDMNDiagramElement;
+
     @Inject
-    public DMNDiagramElementSwitcher(final DMNGraphUtils dmnGraphUtils) {
+    public DMNDiagramElementSwitcher(final DMNGraphUtils dmnGraphUtils,
+                                     final Event<SelectedDMNDiagramElementEvent> drdSelectedEvent) {
         this.dmnGraphUtils = dmnGraphUtils;
+        this.drdSelectedEvent = drdSelectedEvent;
     }
 
     public List<DMNDiagramElement> getDMNDiagramElements() {
         final Definitions definitions = dmnGraphUtils.getDefinitions();
         return definitions.getDmnDiagramElements();
+    }
+
+    public Optional<DMNDiagramElement> getCurrentDMNDiagramElement() {
+        return Optional.ofNullable(currentDMNDiagramElement);
     }
 
     public void switchTo(final DMNDiagramElement dmnDiagramElement) {
@@ -61,6 +73,7 @@ public class DMNDiagramElementSwitcher {
         final AbstractCanvas canvas = getAbstractCanvas();
         final WiresCanvasView view = (WiresCanvasView) canvas.getView();
 
+        setCurrentDMNDiagramElement(dmnDiagramElement);
         getGraphNodes().forEach(node -> {
             getDiagramId(node).ifPresent(nodeDiagramId -> {
 
@@ -79,6 +92,11 @@ public class DMNDiagramElementSwitcher {
         });
 
         refreshCanvas(view);
+    }
+
+    private void setCurrentDMNDiagramElement(final DMNDiagramElement dmnDiagramElement) {
+        currentDMNDiagramElement = dmnDiagramElement;
+        drdSelectedEvent.fire(new SelectedDMNDiagramElementEvent(dmnDiagramElement));
     }
 
     private void refreshCanvas(final AbstractCanvasView abstractCanvasView) {

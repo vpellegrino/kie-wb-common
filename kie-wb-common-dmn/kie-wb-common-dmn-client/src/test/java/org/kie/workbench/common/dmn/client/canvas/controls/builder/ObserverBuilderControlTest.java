@@ -16,6 +16,9 @@
 
 package org.kie.workbench.common.dmn.client.canvas.controls.builder;
 
+import java.util.Optional;
+
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,12 +34,11 @@ import org.kie.workbench.common.dmn.api.definition.model.FunctionDefinition;
 import org.kie.workbench.common.dmn.api.definition.model.IsInformationItem;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.Name;
-import org.kie.workbench.common.dmn.client.docks.navigator.GraphDRDSwitchPOC;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.forms.adf.definitions.DynamicReadOnly;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -44,15 +46,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public class ObserverBuilderControlTest {
 
     @Mock
     private ObserverBuilderControl observerBuilderControl;
 
+    @Mock
+    private DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+
     @Before
     public void setup() {
         doCallRealMethod().when(observerBuilderControl).updateElementFromDefinition(anyObject(), anyObject());
+        when(observerBuilderControl.getDMNDiagramElementSwitcher()).thenReturn(dmnDiagramElementSwitcher);
+        when(dmnDiagramElementSwitcher.getCurrentDMNDiagramElement()).thenReturn(Optional.empty());
     }
 
     @Test
@@ -193,19 +200,17 @@ public class ObserverBuilderControlTest {
         final View elementContent = mock(View.class);
         final Object definition = mock(Object.class);
         final String selectedDiagramId = "selected diagram id";
-        final GraphDRDSwitchPOC graphDRDSwitchPOC = mock(GraphDRDSwitchPOC.class);
         final DMNDiagramElement selectedDiagram = mock(DMNDiagramElement.class);
         final Id id = mock(Id.class);
 
         when(id.getValue()).thenReturn(selectedDiagramId);
         when(selectedDiagram.getId()).thenReturn(id);
-        when(graphDRDSwitchPOC.getSelectedDMNDiagram()).thenReturn(selectedDiagram);
-        when(observerBuilderControl.getGraphDRDSwitchPOC()).thenReturn(graphDRDSwitchPOC);
+        when(dmnDiagramElementSwitcher.getCurrentDMNDiagramElement()).thenReturn(Optional.of(selectedDiagram));
         when(elementContent.getDefinition()).thenReturn(newDefinition);
         when(element.getContent()).thenReturn(elementContent);
 
         observerBuilderControl.updateElementFromDefinition(element, definition);
 
-        verify(newDefinition).setDmnDiagramId(selectedDiagramId);
+        verify(newDefinition).setDMNDiagramId(selectedDiagramId);
     }
 }

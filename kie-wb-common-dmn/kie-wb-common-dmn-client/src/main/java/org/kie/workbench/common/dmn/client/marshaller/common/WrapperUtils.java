@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,6 @@ import org.kie.workbench.common.dmn.api.definition.model.NamedElement;
 import org.kie.workbench.common.dmn.api.definition.model.TextAnnotation;
 import org.kie.workbench.common.dmn.api.property.background.BackgroundSet;
 import org.kie.workbench.common.dmn.api.property.dimensions.RectangleDimensionsSet;
-import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.font.FontSet;
 import org.kie.workbench.common.dmn.client.marshaller.converters.dd.ColorUtils;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dc.JSIBounds;
@@ -61,11 +60,8 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.kie.JSITCo
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JSIName;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
-import org.kie.workbench.common.stunner.core.util.StringUtils;
 
-import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getComposedId;
 import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.getShapeId;
-import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.uniqueId;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.upperLeftBound;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.xOfBound;
 import static org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils.yOfBound;
