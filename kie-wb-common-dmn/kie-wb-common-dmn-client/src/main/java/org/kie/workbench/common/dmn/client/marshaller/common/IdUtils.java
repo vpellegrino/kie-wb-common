@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.marshaller.common;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,13 +64,41 @@ public class IdUtils {
     }
 
     public static String getShapeId(final JSIDMNDiagram diagram,
+                                    final List<String> dmnElementIds,
                                     final String dmnElementId) {
-        return getComposedId("dmnshape", lower(diagram.getName()), dmnElementId);
+
+        final String diagramName = lower(diagram.getName());
+        return getUniqueId("dmnshape", diagramName, dmnElementId, 1, dmnElementIds);
     }
 
     public static String getEdgeId(final JSIDMNDiagram diagram,
+                                   final List<String> dmnElementIds,
                                    final String dmnElementId) {
-        return getComposedId("dmnedge", lower(diagram.getName()), dmnElementId);
+
+        final String diagramName = lower(diagram.getName());
+        return getUniqueId("dmnedge", diagramName, dmnElementId, 1, dmnElementIds);
+    }
+
+    private static String getUniqueId(final String prefix,
+                                      final String diagramName,
+                                      final String dmnElementId,
+                                      final int seed,
+                                      final List<String> dmnElementIds) {
+
+        final String count = seed == 1 ? ""  : Integer.toString(seed);
+        final String id = getComposedId(prefix, diagramName, count, dmnElementId);
+
+        if (dmnElementIds.contains(id)) {
+            return getUniqueId(prefix, diagramName, dmnElementId, seed + 1, dmnElementIds);
+        }
+
+        dmnElementIds.add(id);
+        return id;
+    }
+
+    private static String count(final List<String> dmnElementIds,
+                                final String dmnElementId) {
+        return Long.toString(dmnElementIds.stream().filter(e -> Objects.equals(e, dmnElementId)).count() + 1);
     }
 
     public static String uniqueId() {

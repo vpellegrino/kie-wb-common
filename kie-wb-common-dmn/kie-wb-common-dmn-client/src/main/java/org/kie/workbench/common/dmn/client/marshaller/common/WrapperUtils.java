@@ -15,6 +15,7 @@
  */
 package org.kie.workbench.common.dmn.client.marshaller.common;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -175,10 +176,11 @@ public class WrapperUtils {
     }
 
     public static JSIDMNShape getWrappedJSIDMNShape(final JSIDMNDiagram diagram,
+                                                    final List<String> dmnDiagramElementIds,
                                                     final Definitions definitionsStunnerPojo,
                                                     final View<? extends DMNElement> v,
                                                     final String namespaceURI) {
-        final JSIDMNShape unwrappedJSIDMNShape = stunnerToDDExt(diagram, definitionsStunnerPojo, v, namespaceURI);
+        final JSIDMNShape unwrappedJSIDMNShape = stunnerToDDExt(diagram, dmnDiagramElementIds, definitionsStunnerPojo, v, namespaceURI);
         final JSIDMNShape toReturn = Js.uncheckedCast(JsUtils.getWrappedElement(unwrappedJSIDMNShape));
         final JSIName jsiName = JSIDMNShape.getJSIName();
         updateJSIName(jsiName, "dmndi", "DMNShape");
@@ -225,13 +227,14 @@ public class WrapperUtils {
     }
 
     private static JSIDMNShape stunnerToDDExt(final JSIDMNDiagram diagram,
+                                              final List<String> dmnDiagramElementIds,
                                               final Definitions definitionsStunnerPojo,
                                               final View<? extends DMNElement> v,
                                               final String namespaceURI) {
         final JSIDMNShape result = new JSIDMNShape();
         final DMNElement definition = v.getDefinition();
         final String dmnElementId = definition.getId().getValue();
-        final String shapeId = getShapeId(diagram, dmnElementId);
+        final String shapeId = getShapeId(diagram, dmnDiagramElementIds, dmnElementId);
 
         result.setId(shapeId);
         result.setDmnElementRef(getDmnElementRef(definitionsStunnerPojo, v, namespaceURI));

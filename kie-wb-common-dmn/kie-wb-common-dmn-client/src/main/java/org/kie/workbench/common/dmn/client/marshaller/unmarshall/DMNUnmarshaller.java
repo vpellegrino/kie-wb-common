@@ -121,7 +121,8 @@ public class DMNUnmarshaller {
     }
 
     Promise<Map<JSITImport, PMMLDocumentMetadata>> getPMMLDocuments(final Metadata metadata, final JSITDefinitions jsiDefinitions) {
-        return dmnMarshallerImportsHelper.getPMMLDocumentsAsync(metadata, jsiDefinitions.getImport());
+        final List<JSITImport> imports = jsiDefinitions.getImport();
+        return dmnMarshallerImportsHelper.getPMMLDocumentsAsync(metadata, imports);
     }
 
     private Promise<Graph> unmarshall(final Metadata metadata,

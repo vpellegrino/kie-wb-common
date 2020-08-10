@@ -142,6 +142,7 @@ public class DMNMarshaller {
         final Map<String, JSITDRGElement> nodes = new HashMap<>();
         final Node<View<DMNDiagram>, ?> dmnDiagramRoot = (Node<View<DMNDiagram>, ?>) DMNGraphUtils.findDMNDiagramRoot(graph);
         final Definitions definitionsStunnerPojo = ((DMNDiagram) DefinitionUtils.getElementDefinition(dmnDiagramRoot)).getDefinitions();
+        final List<String> dmnDiagramElementIds = new ArrayList<>();
 
         //Convert relative positioning to absolute
         for (Node<?, ?> node : graph.nodes()) {
@@ -191,11 +192,12 @@ public class DMNMarshaller {
 
                             final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
                             diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
+                                                                                            dmnDiagramElementIds,
                                                                                             definitionsStunnerPojo,
                                                                                             (View<? extends DMNElement>) view,
                                                                                             namespaceURI));
 
-                            connect(diagram, definitionsStunnerPojo, dmnEdges, node, view);
+                            connect(diagram, dmnDiagramElementIds, definitionsStunnerPojo, dmnEdges, node, view);
                         }
                     } else if (view.getDefinition() instanceof TextAnnotation) {
 
@@ -212,6 +214,7 @@ public class DMNMarshaller {
 
                             final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
                             diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
+                                                                                            dmnDiagramElementIds,
                                                                                             definitionsStunnerPojo,
                                                                                             (View<? extends DMNElement>) view,
                                                                                             namespaceURI));
@@ -270,6 +273,7 @@ public class DMNMarshaller {
     }
 
     private void connect(final JSIDMNDiagram diagram,
+                         final List<String> dmnDiagramElementIds,
                          final Definitions definitionsStunnerPojo,
                          final List<JSIDMNEdge> dmnEdges,
                          final Node<?, ?> node,
@@ -317,7 +321,7 @@ public class DMNMarshaller {
                     // DMNDI edge elementRef is uuid of Stunner edge,
                     // with the only exception when edge contains as content a DMN Association (Association is an edge)
                     final String uuid = getRawId(getUUID(e));
-                    final String edgeId = getEdgeId(diagram, uuid);
+                    final String edgeId = getEdgeId(diagram, dmnDiagramElementIds, uuid);
 
                     dmnEdge.setId(edgeId);
                     final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();

@@ -31,11 +31,15 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSIT
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JSIDMNShape;
 import org.kie.workbench.common.stunner.core.graph.Node;
 
+import static org.kie.workbench.common.dmn.client.marshaller.common.IdUtils.uniqueId;
+
 public class NodeEntry {
 
     private String name;
 
     private Node node;
+
+    private final String id;
 
     private final String diagramId;
 
@@ -52,6 +56,7 @@ public class NodeEntry {
               final JSITDMNElement dmnElement,
               final boolean isIncluded,
               final BiConsumer<String, HasComponentWidths> componentWidthsConsumer) {
+        this.id = uniqueId();
         this.diagramId = diagramId;
         this.dmnShape = dmnShape;
         this.dmnElement = dmnElement;
@@ -72,7 +77,7 @@ public class NodeEntry {
     }
 
     public String getId() {
-        return dmnShape.getId();
+        return id;
     }
 
     public boolean isIncluded() {
