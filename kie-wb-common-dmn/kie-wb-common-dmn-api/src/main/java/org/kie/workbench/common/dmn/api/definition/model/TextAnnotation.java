@@ -43,6 +43,7 @@ import org.kie.workbench.common.stunner.core.definition.annotation.PropertySet;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
+import org.kie.workbench.common.stunner.core.graph.content.HasContentDefinitionId;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.processing.fields.fieldInitializers.nestedForms.SubFormFieldInitializer.COLLAPSIBLE_CONTAINER;
@@ -57,6 +58,7 @@ import static org.kie.workbench.common.forms.adf.engine.shared.formGeneration.pr
         startElement = "id")
 public class TextAnnotation extends Artifact implements DMNViewDefinition<GeneralRectangleDimensionsSet>,
                                                         HasText,
+                                                        HasContentDefinitionId,
                                                         DynamicReadOnly {
 
     private static final String[] READONLY_FIELDS = {"Description", "Text", "TextFormat"};
@@ -180,11 +182,17 @@ public class TextAnnotation extends Artifact implements DMNViewDefinition<Genera
         this.textFormat = textFormat;
     }
 
-    public String getDMNDiagramId() {
+    @Override
+    public String getContentDefinitionId() {
+        return getId().getValue();
+    }
+
+    @Override
+    public String getDiagramId() {
         return dmnDiagramId;
     }
 
-    public void setDMNDiagramId(final String dmnDiagramId) {
+    public void setDiagramId(final String dmnDiagramId) {
         this.dmnDiagramId = dmnDiagramId;
     }
 

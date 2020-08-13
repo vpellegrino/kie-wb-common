@@ -96,7 +96,7 @@ public class DecisionComponents {
         final List<DecisionComponent> decisionComponents = new ArrayList<>();
 
         dmnDiagramsSession.getModelDRGElements().forEach(drgElement -> {
-            decisionComponents.add(makeDecisionComponent(drgElement.getDMNDiagramId(),
+            decisionComponents.add(makeDecisionComponent(drgElement.getDiagramId(),
                                                          drgElement));
         });
 

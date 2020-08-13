@@ -66,7 +66,7 @@ public class TextAnnotationConverter implements NodeConverter<JSITTextAnnotation
                                                                  new BackgroundSet(),
                                                                  new FontSet(),
                                                                  new GeneralRectangleDimensionsSet());
-        textAnnotation.setDMNDiagramId(nodeEntry.getDiagramId());
+        textAnnotation.setDiagramId(nodeEntry.getDiagramId());
         node.getContent().setDefinition(textAnnotation);
         return node;
     }

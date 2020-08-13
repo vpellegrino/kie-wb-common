@@ -331,8 +331,8 @@ public class DecisionComponentsTest {
         when(dmnDiagramsSession.getModelDRGElements()).thenReturn(Arrays.asList(drg1Element, drg2Element));
         when(diagramId.getValue()).thenReturn(id);
         when(diagramElement.getId()).thenReturn(diagramId);
-        when(drg1Element.getDMNDiagramId()).thenReturn(id);
-        when(drg2Element.getDMNDiagramId()).thenReturn(id);
+        when(drg1Element.getDiagramId()).thenReturn(id);
+        when(drg2Element.getDiagramId()).thenReturn(id);
         doReturn(decisionComponent1).when(decisionComponents).makeDecisionComponent(id, drg1Element);
         doReturn(decisionComponent2).when(decisionComponents).makeDecisionComponent(id, drg2Element);
         when(view.getComponentsCounter()).thenReturn(existingComponentsCounter);

@@ -189,7 +189,7 @@ public class DMNMarshaller {
                     if (view.getDefinition() instanceof DRGElement) {
 
                         final DRGElement drgElement = (DRGElement) view.getDefinition();
-                        final String dmnDiagramId = drgElement.getDMNDiagramId();
+                        final String dmnDiagramId = drgElement.getDiagramId();
 
                         if (Objects.equals(dmnDiagramId, id)) {
 
@@ -211,7 +211,7 @@ public class DMNMarshaller {
                     } else if (view.getDefinition() instanceof TextAnnotation) {
 
                         final TextAnnotation textAnnotation = (TextAnnotation) view.getDefinition();
-                        final String dmnDiagramId = textAnnotation.getDMNDiagramId();
+                        final String dmnDiagramId = textAnnotation.getDiagramId();
 
                         if (Objects.equals(dmnDiagramId, id)) {
 

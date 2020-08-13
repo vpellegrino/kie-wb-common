@@ -19,6 +19,7 @@ package org.kie.workbench.common.dmn.client.docks.navigator.drds;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,10 +33,11 @@ import org.kie.workbench.common.dmn.api.definition.model.Import;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.diagram.SelectedDiagramProvider;
 import org.uberfire.backend.vfs.Path;
 
 @ApplicationScoped
-public class DMNDiagramsSession {
+public class DMNDiagramsSession implements SelectedDiagramProvider {
 
     private ManagedInstance<DMNDiagramsSessionState> dmnDiagramsSessionStates;
 
@@ -161,5 +163,18 @@ public class DMNDiagramsSession {
 
     public List<Import> getModelImports() {
         return getSessionState().getModelImports();
+    }
+
+    @Override
+    public boolean isGlobalGraph() {
+        return getCurrentDMNDiagramElement().isPresent() &&
+                Objects.equals(getCurrentDMNDiagramElement().get().getName().getValue(), "DRG");
+    }
+
+    @Override
+    public String getSelectedDiagramId() {
+        return getCurrentDMNDiagramElement()
+                .map(e -> e.getId().getValue())
+                .orElse(null);
     }
 }
