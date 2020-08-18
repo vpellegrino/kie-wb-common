@@ -132,18 +132,31 @@ public class PreviewDiagramScreen {
     }
 
     void onCanvasSessionOpened(final @Observes SessionOpenedEvent sessionOpenedEvent) {
-        checkNotNull("sessionOpenedEvent", sessionOpenedEvent);
-        showPreview(sessionOpenedEvent.getSession());
+        try {
+            checkNotNull("sessionOpenedEvent", sessionOpenedEvent);
+            showPreview(sessionOpenedEvent.getSession());
+        } catch (final Exception e) {
+            // TODO {karreiro}: Fix mini diagram preview.
+        }
     }
 
     void onCanvasSessionDestroyed(final @Observes SessionDestroyedEvent sessionDestroyedEvent) {
-        checkNotNull("sessionDestroyedEvent", sessionDestroyedEvent);
-        closePreview();
+        try {
+            checkNotNull("sessionDestroyedEvent", sessionDestroyedEvent);
+            closePreview();
+        } catch (final Exception e) {
+            // TODO {karreiro}: Fix mini diagram preview.
+        }
     }
 
     void onSessionDiagramOpenedEvent(final @Observes SessionDiagramOpenedEvent sessionDiagramOpenedEvent) {
-        checkNotNull("sessionDiagramOpenedEvent", sessionDiagramOpenedEvent);
-        showPreview(sessionDiagramOpenedEvent.getSession());
+        try {
+            checkNotNull("sessionDiagramOpenedEvent", sessionDiagramOpenedEvent);
+            showPreview(sessionDiagramOpenedEvent.getSession());
+            closePreview();
+        } catch (final Exception e) {
+            // TODO {karreiro}: Fix mini diagram preview.
+        }
     }
 
     void showPreview(final ClientSession session) {
