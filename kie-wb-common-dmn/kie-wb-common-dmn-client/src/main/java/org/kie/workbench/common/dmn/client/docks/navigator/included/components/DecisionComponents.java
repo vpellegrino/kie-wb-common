@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -31,16 +30,13 @@ import javax.inject.Inject;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
-import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.definition.model.Import;
 import org.kie.workbench.common.dmn.api.editors.included.DMNImportTypes;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedModel;
 import org.kie.workbench.common.dmn.api.editors.included.DMNIncludedNode;
 import org.kie.workbench.common.dmn.client.api.included.legacy.DMNIncludeModelsClient;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
-import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.util.FileUtils;
@@ -53,8 +49,6 @@ public class DecisionComponents {
 
     private final View view;
 
-    private final DMNGraphUtils graphUtils;
-
     private final DMNIncludeModelsClient client;
 
     private final ManagedInstance<DecisionComponentsItem> itemManagedInstance;
@@ -63,25 +57,19 @@ public class DecisionComponents {
 
     private final List<DecisionComponentsItem> decisionComponentsItems = new ArrayList<>();
 
-    private final DMNGraphUtils dmnGraphUtils;
-
-    private final DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+    private final DMNDiagramsSession dmnDiagramsSession;
 
     @Inject
     public DecisionComponents(final View view,
-                              final DMNGraphUtils graphUtils,
                               final DMNIncludeModelsClient client,
                               final ManagedInstance<DecisionComponentsItem> itemManagedInstance,
                               final DecisionComponentFilter filter,
-                              final DMNGraphUtils dmnGraphUtils,
-                              final DMNDiagramElementSwitcher dmnDiagramElementSwitcher) {
+                              final DMNDiagramsSession dmnDiagramsSession) {
         this.view = view;
-        this.graphUtils = graphUtils;
         this.client = client;
         this.itemManagedInstance = itemManagedInstance;
         this.filter = filter;
-        this.dmnGraphUtils = dmnGraphUtils;
-        this.dmnDiagramElementSwitcher = dmnDiagramElementSwitcher;
+        this.dmnDiagramsSession = dmnDiagramsSession;
     }
 
     @PostConstruct
@@ -93,45 +81,24 @@ public class DecisionComponents {
         return view;
     }
 
-    public void refresh(final Diagram diagram) {
+    public void refresh() {
 
         clearDecisionComponents();
         startLoading();
 
-        client.loadNodesFromImports(getDMNIncludedModels(diagram), getNodesConsumer());
+        client.loadNodesFromImports(getDMNIncludedModels(), getNodesConsumer());
 
         loadDRDComponents();
     }
 
     void loadDRDComponents() {
-        for (final DMNDiagramElement diagramElement : dmnDiagramElementSwitcher.getDMNDiagramElements()) {
-            loadDRDComponentsFromDiagram(diagramElement);
-        }
-    }
 
-    void loadDRDComponentsFromDiagram(final DMNDiagramElement diagramElement) {
-
-        final String drdId = diagramElement.getId().getValue();
-        final Stream<Node> nodeStream = dmnGraphUtils.getNodeStream();
         final List<DecisionComponent> decisionComponents = new ArrayList<>();
 
-        nodeStream.filter(this::definitionContainsDRGElement)
-                .forEach((Node node) -> {
-                    final Object content = node.getContent();
-                    if (content instanceof Definition) {
-                        final Object definition = ((Definition) content).getDefinition();
-                        if (definition instanceof DRGElement) {
-                            final DRGElement drgElement = (DRGElement) definition;
-                            final String dmnDiagramId = drgElement.getDMNDiagramId();
-
-                            if (Objects.equals(dmnDiagramId, drdId)) {
-                                final DecisionComponent decisionComponent = makeDecisionComponent(dmnDiagramId,
-                                                                                                  drgElement);
-                                decisionComponents.add(decisionComponent);
-                            }
-                        }
-                    }
-                });
+        dmnDiagramsSession.getModelDRGElements().forEach(drgElement -> {
+            decisionComponents.add(makeDecisionComponent(drgElement.getDMNDiagramId(),
+                                                         drgElement));
+        });
 
         createDecisionComponentItems(decisionComponents);
 
@@ -223,10 +190,9 @@ public class DecisionComponents {
         return new DecisionComponent(id, drgElement, false);
     }
 
-    List<DMNIncludedModel> getDMNIncludedModels(final Diagram diagram) {
-        return graphUtils
-                .getDefinitions(diagram)
-                .getImport()
+    List<DMNIncludedModel> getDMNIncludedModels() {
+        return dmnDiagramsSession
+                .getModelImports()
                 .stream()
                 .filter(anImport -> Objects.equals(DMNImportTypes.DMN, determineImportType(anImport.getImportType())))
                 .map(this::asDMNIncludedModel)

@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
-import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.Import;
 import org.kie.workbench.common.dmn.api.definition.model.ImportDMN;
 import org.kie.workbench.common.dmn.api.definition.model.ImportPMML;
@@ -41,9 +40,8 @@ import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.LocationURI;
 import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.client.api.included.legacy.DMNIncludeModelsClient;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +56,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -89,7 +86,7 @@ public class DecisionComponentsTest {
     private DMNGraphUtils dmnGraphUtils;
 
     @Mock
-    private DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+    private DMNDiagramsSession dmnDiagramsSession;
 
     @Captor
     private ArgumentCaptor<List<DecisionComponent>> decisionComponentListCaptor;
@@ -99,7 +96,7 @@ public class DecisionComponentsTest {
     @Before
     public void setup() {
 
-        decisionComponents = spy(new DecisionComponents(view, graphUtils, client, itemManagedInstance, filter, dmnGraphUtils, dmnDiagramElementSwitcher));
+        decisionComponents = spy(new DecisionComponents(view, client, itemManagedInstance, filter, dmnDiagramsSession));
     }
 
     @Test
@@ -116,14 +113,13 @@ public class DecisionComponentsTest {
     @Test
     public void testRefresh() {
 
-        final Diagram diagram = mock(Diagram.class);
         final List<DMNIncludedModel> includedModels = new ArrayList<>();
         final Consumer<List<DMNIncludedNode>> listConsumer = (list) -> {/* Nothing. */};
 
-        doReturn(includedModels).when(decisionComponents).getDMNIncludedModels(diagram);
+        doReturn(includedModels).when(decisionComponents).getDMNIncludedModels();
         doReturn(listConsumer).when(decisionComponents).getNodesConsumer();
 
-        decisionComponents.refresh(diagram);
+        decisionComponents.refresh();
 
         verify(decisionComponents).clearDecisionComponents();
         verify(decisionComponents).startLoading();
@@ -133,18 +129,15 @@ public class DecisionComponentsTest {
 
     @Test
     public void testGetDMNIncludedModelsOnlyIncludesDMN() {
-        final Diagram diagram = mock(Diagram.class);
-        final Definitions definitions = new Definitions();
         final ImportDMN dmnImport = new ImportDMN();
         final ImportPMML pmmlImport = new ImportPMML();
         dmnImport.getName().setValue("dmn");
         dmnImport.setImportType(DMNImportTypes.DMN.getDefaultNamespace());
         pmmlImport.setImportType(DMNImportTypes.PMML.getDefaultNamespace());
-        definitions.getImport().addAll(asList(dmnImport, pmmlImport));
 
-        when(graphUtils.getDefinitions(diagram)).thenReturn(definitions);
+        when(dmnDiagramsSession.getModelImports()).thenReturn(asList(dmnImport, pmmlImport));
 
-        final List<DMNIncludedModel> includedModels = decisionComponents.getDMNIncludedModels(diagram);
+        final List<DMNIncludedModel> includedModels = decisionComponents.getDMNIncludedModels();
 
         assertThat(includedModels).hasSize(1);
         assertThat(includedModels.get(0).getModelName()).isEqualTo("dmn");
@@ -324,48 +317,35 @@ public class DecisionComponentsTest {
     }
 
     @Test
-    public void testLoadDRDComponentsFromDiagram() {
+    public void testLoadDRDComponents() {
 
         final int existingComponentsCounter = 3;
         final Id diagramId = mock(Id.class);
-        final String id = "diagram id";
-        final Node node1 = mock(Node.class);
-        final Node node2 = mock(Node.class);
-        final Node node3 = mock(Node.class);
+        final String id = "0000-1111-2222";
         final DMNDiagramElement diagramElement = mock(DMNDiagramElement.class);
-        final Definition node1Content = mock(Definition.class);
-        final Definition node2Content = mock(Definition.class);
-        final DRGElement node1DRGElement = mock(DRGElement.class);
-        final DRGElement node2DRGElement = mock(DRGElement.class);
+        final DRGElement drg1Element = mock(DRGElement.class);
+        final DRGElement drg2Element = mock(DRGElement.class);
         final DecisionComponent decisionComponent1 = mock(DecisionComponent.class);
         final DecisionComponent decisionComponent2 = mock(DecisionComponent.class);
 
-        when(dmnGraphUtils.getNodeStream())
-                .thenReturn(Arrays.asList(node1, node2, node3).stream());
+        when(dmnDiagramsSession.getModelDRGElements()).thenReturn(Arrays.asList(drg1Element, drg2Element));
         when(diagramId.getValue()).thenReturn(id);
         when(diagramElement.getId()).thenReturn(diagramId);
-        doReturn(true).when(decisionComponents).definitionContainsDRGElement(node1);
-        doReturn(true).when(decisionComponents).definitionContainsDRGElement(node2);
-        doReturn(false).when(decisionComponents).definitionContainsDRGElement(node3);
-        when(node1.getContent()).thenReturn(node1Content);
-        when(node2.getContent()).thenReturn(node2Content);
-        when(node1Content.getDefinition()).thenReturn(node1DRGElement);
-        when(node2Content.getDefinition()).thenReturn(node2DRGElement);
-        when(node1DRGElement.getDMNDiagramId()).thenReturn(id);
-        when(node2DRGElement.getDMNDiagramId()).thenReturn(id);
-        doReturn(decisionComponent1).when(decisionComponents).makeDecisionComponent(id, node1DRGElement);
-        doReturn(decisionComponent2).when(decisionComponents).makeDecisionComponent(id, node2DRGElement);
+        when(drg1Element.getDMNDiagramId()).thenReturn(id);
+        when(drg2Element.getDMNDiagramId()).thenReturn(id);
+        doReturn(decisionComponent1).when(decisionComponents).makeDecisionComponent(id, drg1Element);
+        doReturn(decisionComponent2).when(decisionComponents).makeDecisionComponent(id, drg2Element);
         when(view.getComponentsCounter()).thenReturn(existingComponentsCounter);
-        doNothing().when(decisionComponents).createDecisionComponentItems(anyList());
+        doNothing().when(decisionComponents).createDecisionComponentItems(any());
 
-        decisionComponents.loadDRDComponentsFromDiagram(diagramElement);
+        decisionComponents.loadDRDComponents();
 
         verify(view).enableFilterInputs();
         verify(view).hideLoading();
         verify(view).setComponentsCounter(existingComponentsCounter + 2);
         verify(decisionComponents).createDecisionComponentItems(decisionComponentListCaptor.capture());
-        verify(decisionComponents).makeDecisionComponent(id, node1DRGElement);
-        verify(decisionComponents).makeDecisionComponent(id, node2DRGElement);
+        verify(decisionComponents).makeDecisionComponent(id, drg1Element);
+        verify(decisionComponents).makeDecisionComponent(id, drg2Element);
 
         final List<DecisionComponent> list = decisionComponentListCaptor.getValue();
         assertTrue(list.contains(decisionComponent1));
