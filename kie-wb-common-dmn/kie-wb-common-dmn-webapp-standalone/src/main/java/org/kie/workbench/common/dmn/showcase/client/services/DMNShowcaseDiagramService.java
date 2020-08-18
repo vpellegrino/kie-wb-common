@@ -16,8 +16,10 @@
 package org.kie.workbench.common.dmn.showcase.client.services;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
@@ -26,9 +28,12 @@ import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
-import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.factory.DMNDiagramFactory;
 import org.kie.workbench.common.dmn.client.DMNShapeSet;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12UnmarshallCallback;
@@ -49,13 +54,9 @@ import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
-import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
 import org.kie.workbench.common.stunner.core.lookup.LookupManager;
 import org.kie.workbench.common.stunner.core.lookup.diagram.DiagramLookupRequest;
 import org.kie.workbench.common.stunner.core.lookup.diagram.DiagramRepresentation;
-import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
@@ -87,6 +88,14 @@ public class DMNShowcaseDiagramService {
 
     @Inject
     private CanvasExport<AbstractCanvasHandler> canvasExport;
+
+    @Inject
+    private DMNDiagramsSession dmnDiagramsSession;
+
+    @Inject
+    private DMNGraphUtils dmnGraphUtils;
+
+    private ServiceCallback<Diagram> onLoadDiagramCallback;
 
     public DMNShowcaseDiagramService() {
         this(null,
@@ -125,41 +134,70 @@ public class DMNShowcaseDiagramService {
         dmnContentServiceCaller.call(new RemoteCallback<String>() {
             @Override
             public void callback(final String xml) {
-                final Metadata metadata = buildMetadataInstance();
 
                 try {
                     final DMN12UnmarshallCallback jsCallback = dmn12 -> {
                         final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-                        aa(metadata, definitions, metadata, callback);
+                        load(path, definitions, callback);
                     };
 
                     MainJs.unmarshall(xml, "", jsCallback);
                 } catch (Exception e) {
                     GWT.log(e.getMessage(), e);
-                    callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
+                    callback.onError(new ClientRuntimeError(new DiagramParsingException(null, xml)));
                 }
             }
         }).getContent(path);
     }
 
-    private void aa(final Metadata metadata, final JSITDefinitions definitions, final Metadata metadata2, final ServiceCallback<Diagram> callback) {
-        dmnMarshallerKogitoUnmarshaller.unmarshall(metadata2, definitions).then(graph -> {
-            final Node<Definition<DMNDiagram>, ?> diagramNode = GraphUtils.getFirstNode((Graph<?, Node>) graph, DMNDiagram.class);
-            final String title = ((DMNDiagram) DefinitionUtils.getElementDefinition(diagramNode)).getDefinitions().getName().getValue();
-            final Diagram diagram = dmnDiagramFactory.build(title, metadata2, graph);
-            updateClientShapeSetId(diagram);
+    private void load(final Path path,
+                      final JSITDefinitions definitions,
+                      final ServiceCallback<Diagram> callback) {
 
+        this.onLoadDiagramCallback = callback;
+
+        Metadata metadata = buildMetadataInstance(path);
+
+        dmnMarshallerKogitoUnmarshaller.unmarshall(metadata, definitions).then(_graph -> {
+
+            final Diagram diagram = dmnDiagramFactory.build("DRG", metadata, _graph);
+
+            updateClientShapeSetId(diagram);
             callback.onSuccess(diagram);
+
             return promises.resolve();
         });
     }
 
-    private Metadata buildMetadataInstance() {
+    public void switchToDMNDiagramElement(final @Observes DMNDiagramSelected selected) {
+
+        final DMNDiagramElement dmnDiagramElement = selected.getDiagramElement();
+        final boolean belongsToCurrentSessionState = dmnDiagramsSession.belongsToCurrentSessionState(dmnDiagramElement);
+
+        if (belongsToCurrentSessionState && getOnLoadDiagramCallback().isPresent()) {
+
+            final String diagramId = dmnDiagramElement.getId().getValue();
+            final String diagramName = dmnDiagramElement.getName().getValue();
+            final Diagram stunnerDiagram = dmnDiagramsSession.getDiagram(diagramId);
+            final Metadata metadata = buildMetadataInstance(stunnerDiagram.getMetadata().getPath());
+            final Diagram diagram = dmnDiagramFactory.build(diagramName, metadata, stunnerDiagram.getGraph());
+
+            updateClientShapeSetId(diagram);
+            getOnLoadDiagramCallback().get().onSuccess(diagram);
+        }
+    }
+
+    private Optional<ServiceCallback<Diagram>> getOnLoadDiagramCallback() {
+        return Optional.ofNullable(onLoadDiagramCallback);
+    }
+
+    private Metadata buildMetadataInstance(final Path path) {
         final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
         final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
         return new MetadataImpl.MetadataImplBuilder(defSetId,
                                                     definitionManager)
                 .setRoot(PathFactory.newPath(".", ROOT))
+                .setPath(path)
                 .setShapeSetId(shapeSetId)
                 .build();
     }

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -41,6 +43,7 @@ import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.InputData;
 import org.kie.workbench.common.dmn.api.definition.model.KnowledgeSource;
 import org.kie.workbench.common.dmn.api.definition.model.TextAnnotation;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.common.WrapperUtils;
 import org.kie.workbench.common.dmn.client.marshaller.converters.AssociationConverter;
@@ -69,6 +72,7 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmndi12.JS
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.kie.JSITComponentWidths;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.kie.JSITComponentsWidthsExtension;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -119,6 +123,9 @@ public class DMNMarshaller {
     private TextAnnotationConverter textAnnotationConverter;
     private DecisionServiceConverter decisionServiceConverter;
 
+    @Inject
+    private DMNDiagramsSession dmnDiagramsSession;
+
     protected DMNMarshaller() {
         this(null);
     }
@@ -138,16 +145,11 @@ public class DMNMarshaller {
         MainJs.initializeJsInteropConstructors(MainJs.getConstructorsMap());
     }
 
-    public JSITDefinitions marshall(final Graph<?, Node<View, ?>> graph) {
+    public JSITDefinitions marshall(final Graph<?, Node<View, ?>> _graph) {
         final Map<String, JSITDRGElement> nodes = new HashMap<>();
-        final Node<View<DMNDiagram>, ?> dmnDiagramRoot = (Node<View<DMNDiagram>, ?>) DMNGraphUtils.findDMNDiagramRoot(graph);
+        final Node<View<DMNDiagram>, ?> dmnDiagramRoot = (Node<View<DMNDiagram>, ?>) DMNGraphUtils.findDMNDiagramRoot(dmnDiagramsSession.getDRGDiagram().getGraph());
         final Definitions definitionsStunnerPojo = ((DMNDiagram) DefinitionUtils.getElementDefinition(dmnDiagramRoot)).getDefinitions();
         final List<String> dmnDiagramElementIds = new ArrayList<>();
-
-        //Convert relative positioning to absolute
-        for (Node<?, ?> node : graph.nodes()) {
-            PointUtils.convertToAbsoluteBounds(node);
-        }
 
         final JSITDefinitions definitions = DefinitionsConverter.dmnFromWB(definitionsStunnerPojo, true);
         if (Objects.isNull(definitions.getExtensionElements())) {
@@ -161,6 +163,7 @@ public class DMNMarshaller {
             final String id = diagram.getId();
             final List<JSIDMNEdge> dmnEdges = new ArrayList<>();
             final Map<String, JSITTextAnnotation> textAnnotations = new HashMap<>();
+            final List<Node> diagramNodes = getNodeStream(dmnDiagramsSession.getDiagram(id));
 
             //Setup callback for marshalling ComponentWidths
             if (Objects.isNull(diagram.getExtension())) {
@@ -173,8 +176,14 @@ public class DMNMarshaller {
 
             final Consumer<JSITComponentWidths> componentWidthsConsumer = (cw) -> componentsWidthsExtension.addComponentWidths(cw);
 
+            //Convert relative positioning to absolute
+            for (Node<?, ?> node : diagramNodes) {
+                PointUtils.convertToAbsoluteBounds(node);
+            }
+
             //Iterate Graph processing nodes..
-            for (Node<?, ?> node : graph.nodes()) {
+            for (Node<?, ?> node : diagramNodes) {
+
                 if (node.getContent() instanceof View<?>) {
                     final View<?> view = (View<?>) node.getContent();
                     if (view.getDefinition() instanceof DRGElement) {
@@ -265,11 +274,16 @@ public class DMNMarshaller {
         });
 
         //Convert relative positioning to absolute
-        for (Node<?, ?> node : graph.nodes()) {
-            PointUtils.convertToAbsoluteBounds(node);
-        }
+//        for (Node<?, ?> node : graph.nodes()) {
+//            PointUtils.convertToAbsoluteBounds(node);
+//        }
 
         return definitions;
+    }
+
+    public List<Node> getNodeStream(final Diagram diagram) {
+        final Graph<?, Node> graph = diagram.getGraph();
+        return StreamSupport.stream(graph.nodes().spliterator(), false).collect(Collectors.toList());
     }
 
     private void connect(final JSIDMNDiagram diagram,

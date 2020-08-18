@@ -29,6 +29,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -153,6 +154,9 @@ public class DMNDiagramEditorTest {
     private MonacoFEELInitializer feelInitializer;
 
     @Mock
+    private DMNDiagramsSession dmnDiagramsSession;
+
+    @Mock
     private ElementWrapperWidget searchBarComponentWidget;
     private DMNDiagramEditor editor;
 
@@ -202,7 +206,8 @@ public class DMNDiagramEditorTest {
                                           screenPanelView,
                                           null,
                                           kieView,
-                                          feelInitializer));
+                                          feelInitializer,
+                                          dmnDiagramsSession));
 
         doReturn(searchBarComponentWidget).when(editor).getWidget(searchBarComponentViewElement);
     }
@@ -304,7 +309,7 @@ public class DMNDiagramEditorTest {
         verify(layoutHelper).applyLayout(diagram, layoutExecutor);
 
         final InOrder inOrder = inOrder(decisionNavigatorDock, diagramPreviewAndExplorerDock, diagramPropertiesDock);
-        inOrder.verify(decisionNavigatorDock).setupCanvasHandler(canvasHandler);
+        inOrder.verify(decisionNavigatorDock).reload();
         inOrder.verify(decisionNavigatorDock).open();
         inOrder.verify(diagramPropertiesDock).open();
         inOrder.verify(diagramPreviewAndExplorerDock).open();

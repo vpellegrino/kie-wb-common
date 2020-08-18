@@ -375,7 +375,7 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
         canvasHandler.ifPresent(c -> {
             final ExpressionEditorView.Presenter expressionEditor = ((DMNSession) sessionManager.getCurrentSession()).getExpressionEditor();
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
-            decisionNavigatorDock.setupCanvasHandler(c);
+            decisionNavigatorDock.reload();
             dataTypesPage.reload();
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });

@@ -27,7 +27,6 @@ import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -99,9 +98,6 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
     private final Event<NotificationEvent> notificationEvent;
     private final DMNVFSService vfsService;
-
-    @Inject
-    private DMNDiagramElementSwitcher switcher;
 
     @Inject
     public DMNDiagramEditor(final View view,
@@ -182,8 +178,8 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
     @SuppressWarnings("unused")
     public void onStartup(final PlaceRequest place) {
         super.onStartup(place);
-
-        setContent("", place.getParameter(CONTENT_PARAMETER_NAME, ""));
+        final String title = getFileName();
+        setContent(title, place.getParameter(CONTENT_PARAMETER_NAME, ""));
     }
 
     @Override
@@ -205,10 +201,14 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
     @Override
     public void initialiseKieEditorForSession(final Diagram diagram) {
-        final String title = getPlaceRequest().getParameter(DMNDiagramEditor.FILE_NAME_PARAMETER_NAME, "");
+        final String title = getFileName();
         diagram.getMetadata().setTitle(title);
 
         super.initialiseKieEditorForSession(diagram);
+    }
+
+    private String getFileName() {
+        return getPlaceRequest().getParameter(DMNDiagramEditor.FILE_NAME_PARAMETER_NAME, "");
     }
 
     @Override
@@ -221,9 +221,8 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
             final ExpressionEditorView.Presenter expressionEditor = ((DMNSession) sessionManager.getCurrentSession()).getExpressionEditor();
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
-            decisionNavigatorDock.setupCanvasHandler(c);
+            decisionNavigatorDock.reload();
             dataTypesPage.reload();
-            switcher.switchTo(switcher.getDMNDiagramElements().get(switcher.getDMNDiagramElements().size() - 1));
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });
     }

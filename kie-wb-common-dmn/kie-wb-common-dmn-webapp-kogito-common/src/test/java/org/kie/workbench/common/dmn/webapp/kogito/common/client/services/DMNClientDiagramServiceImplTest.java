@@ -65,6 +65,6 @@ public class DMNClientDiagramServiceImplTest {
         service.transform(fileName, xml, callback);
 
         verify(service, never()).doNewDiagram(title, callback);
-        verify(service).doTransformation(xml, callback);
+        verify(service).doTransformation(fileName, xml, callback);
     }
 }
