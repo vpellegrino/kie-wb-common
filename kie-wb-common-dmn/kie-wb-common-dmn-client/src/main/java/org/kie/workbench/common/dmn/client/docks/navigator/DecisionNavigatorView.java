@@ -18,13 +18,9 @@ package org.kie.workbench.common.dmn.client.docks.navigator;
 
 import javax.inject.Inject;
 
-import elemental2.dom.DomGlobal;
-import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
 
@@ -33,9 +29,6 @@ import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHel
 
 @Templated
 public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
-
-    @DataField("switch-drds")
-    private final HTMLDivElement switchDRDs;
 
     @DataField("main-tree")
     private final HTMLDivElement mainTree;
@@ -46,41 +39,20 @@ public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
     @DataField("decision-components")
     private final HTMLDivElement decisionComponents;
 
-    private final DMNDiagramElementSwitcher switcher;
-
     private DecisionNavigatorPresenter presenter;
 
     @Inject
-    public DecisionNavigatorView(final HTMLDivElement switchDRDs,
-                                 final HTMLDivElement mainTree,
+    public DecisionNavigatorView(final HTMLDivElement mainTree,
                                  final HTMLDivElement decisionComponentsContainer,
-                                 final HTMLDivElement decisionComponents,
-                                 final DMNDiagramElementSwitcher switcher) {
-        this.switchDRDs = switchDRDs;
+                                 final HTMLDivElement decisionComponents) {
         this.mainTree = mainTree;
         this.decisionComponentsContainer = decisionComponentsContainer;
         this.decisionComponents = decisionComponents;
-        this.switcher = switcher;
     }
 
     @Override
     public void init(final DecisionNavigatorPresenter presenter) {
         this.presenter = presenter;
-
-        switchDRDs.innerHTML = "";
-
-        for (final DMNDiagramElement dmnDiagramElement : switcher.getDMNDiagramElements()) {
-            final Element button = DomGlobal.document.createElement("button");
-
-            button.classList.add("button-poc");
-            button.textContent = dmnDiagramElement.getName().getValue();
-            button.onclick = e -> {
-                switcher.switchTo(dmnDiagramElement);
-                return false;
-            };
-
-            switchDRDs.appendChild(button);
-        }
     }
 
     @Override

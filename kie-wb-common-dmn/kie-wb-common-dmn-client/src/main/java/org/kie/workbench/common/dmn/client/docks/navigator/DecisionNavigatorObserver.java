@@ -30,12 +30,11 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.CanvasClearEven
 import org.kie.workbench.common.stunner.core.client.canvas.event.registration.CanvasElementAddedEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.registration.CanvasElementRemovedEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.registration.CanvasElementUpdatedEvent;
-import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedShapeEvent;
-import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.Node;
 
 @ApplicationScoped
 public class DecisionNavigatorObserver {
+
+    // TODO {karreiro}: === WORK IN PROGRESS ==
 
     private DecisionNavigatorPresenter presenter;
 
@@ -45,53 +44,31 @@ public class DecisionNavigatorObserver {
 
     @SuppressWarnings("unused")
     void onCanvasClear(final @Observes CanvasClearEvent event) {
-        getOptionalPresenter().ifPresent(p -> {
-            p.removeAllElements();
-            p.refreshTreeView();
-        });
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementAdded(final @Observes CanvasElementAddedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementUpdated(final @Observes CanvasElementUpdatedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementRemoved(final @Observes CanvasElementRemovedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.removeElement(event.getElement()));
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onNestedElementSelected(final @Observes EditExpressionEvent event) {
-        selectItem(event);
-        setActiveParent(event);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onNestedElementAdded(final @Observes ExpressionEditorChanged event) {
-        presenter.getGraph().ifPresent(this::updateNode);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
-    private void updateNode(final Graph graph) {
+    void selectItem(final HasExpression hasExpression) {
 
-        getActiveParent().ifPresent(activeParent -> {
-
-            final String activeParentUUID = activeParent.getUUID();
-            final Node node = graph.getNode(activeParentUUID);
-
-            presenter.updateElement(node);
-
-            activeParent.getChildren().forEach(e -> getTreePresenter().selectItem(e.getUUID()));
-        });
-    }
-
-    void onNestedElementLostFocus(final @Observes CanvasFocusedShapeEvent event) {
-        getTreePresenter().deselectItem();
-    }
-
-    void selectItem(final EditExpressionEvent event) {
-
-        final HasExpression hasExpression = event.getHasExpression();
         final Optional<Expression> optionalExpression = Optional.ofNullable(hasExpression.getExpression());
 
         optionalExpression.ifPresent(expression -> {

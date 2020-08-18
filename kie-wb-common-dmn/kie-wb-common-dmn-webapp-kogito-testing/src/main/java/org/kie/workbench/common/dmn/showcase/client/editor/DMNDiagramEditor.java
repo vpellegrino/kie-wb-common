@@ -178,7 +178,7 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
     @SuppressWarnings("unused")
     public void onStartup(final PlaceRequest place) {
         super.onStartup(place);
-        final String title = getFileName();
+        final String title = getPlaceRequest().getParameter(DMNDiagramEditor.FILE_NAME_PARAMETER_NAME, "");
         setContent(title, place.getParameter(CONTENT_PARAMETER_NAME, ""));
     }
 
@@ -201,14 +201,10 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
     @Override
     public void initialiseKieEditorForSession(final Diagram diagram) {
-        final String title = getFileName();
+        final String title = getPlaceRequest().getParameter(DMNDiagramEditor.FILE_NAME_PARAMETER_NAME, "");
         diagram.getMetadata().setTitle(title);
 
         super.initialiseKieEditorForSession(diagram);
-    }
-
-    private String getFileName() {
-        return getPlaceRequest().getParameter(DMNDiagramEditor.FILE_NAME_PARAMETER_NAME, "");
     }
 
     @Override

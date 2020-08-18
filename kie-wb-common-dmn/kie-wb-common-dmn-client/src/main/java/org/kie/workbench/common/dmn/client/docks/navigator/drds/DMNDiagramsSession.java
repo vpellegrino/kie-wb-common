@@ -64,9 +64,7 @@ public class DMNDiagramsSession {
 
         final DMNDiagramsSessionState state = dmnDiagramsSessionStates.get();
 
-        state.getDiagramsByDiagramId().clear();
         state.getDiagramsByDiagramId().putAll(diagramsByDiagramElementId);
-        state.getDMNDiagramsByDiagramId().clear();
         state.getDMNDiagramsByDiagramId().putAll(dmnDiagramsByDiagramElementId);
 
         dmnSessionStatesByPathURI.put(getSessionKey(metadata), state);
@@ -85,7 +83,7 @@ public class DMNDiagramsSession {
                 .orElse("");
     }
 
-    private String getSessionKey(final Metadata metadata) {
+    public String getSessionKey(final Metadata metadata) {
         return Optional
                 .ofNullable(metadata)
                 .map(Metadata::getPath)

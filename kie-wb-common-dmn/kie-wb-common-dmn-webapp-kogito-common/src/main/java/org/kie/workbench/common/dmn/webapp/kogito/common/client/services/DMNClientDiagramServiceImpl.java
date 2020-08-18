@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.dmn.webapp.kogito.common.client.services;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,15 +30,20 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.factory.DMNDiagramFactory;
+import org.kie.workbench.common.dmn.api.property.dmn.Id;
+import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.client.DMNShapeSet;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorPresenter;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
 import org.kie.workbench.common.dmn.client.session.DMNSession;
@@ -59,6 +65,8 @@ import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.kie.workbench.common.stunner.kogito.api.editor.DiagramType;
 import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
@@ -139,14 +147,28 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
     void doNewDiagram(final String fileName,
                       final ServiceCallback<Diagram> callback) {
         final String title = createDiagramTitleFromFilePath(fileName);
-        final Metadata metadata = buildMetadataInstance(title);
+        final Metadata metadata = buildMetadataInstance(fileName);
 
         try {
             final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
-            final Diagram diagram = factoryManager.newDiagram(title, defSetId, metadata);
-            updateClientShapeSetId(diagram);
+            final Diagram stunnerDiagram = factoryManager.newDiagram(title, defSetId, metadata);
+            final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(stunnerDiagram.getGraph());
+            final DMNDiagram definition = ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition();
+            final DMNDiagramElement drgDiagram = new DMNDiagramElement(new Id(), new Name("DRG"));
+            definition.getDefinitions().getDmnDiagramElements().add(drgDiagram);
+            final String diagramId = drgDiagram.getId().getValue();
 
-            callback.onSuccess(diagram);
+            final Map<String, Diagram> diagramsByDiagramElementId = new HashMap<>();
+            final Map<String, DMNDiagramElement> dmnDiagramsByDiagramElementId = new HashMap<>();
+
+            diagramsByDiagramElementId.put(diagramId, stunnerDiagram);
+            dmnDiagramsByDiagramElementId.put(diagramId, drgDiagram);
+
+            dmnDiagramsSession.setState(metadata, diagramsByDiagramElementId, dmnDiagramsByDiagramElementId);
+
+            updateClientShapeSetId(stunnerDiagram);
+
+            callback.onSuccess(stunnerDiagram);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -178,13 +200,14 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
                           final String xml,
                           final ServiceCallback<Diagram> callback) {
 
-        this.onLoadDiagramCallback = callback;
+        onLoadDiagramCallback = callback;
+        metadata = buildMetadataInstance(fileName);
 
         try {
 
             final DMN12UnmarshallCallback jsCallback = dmn12 -> {
                 final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-                metadata = buildMetadataInstance(fileName);
+
                 dmnMarshallerKogitoUnmarshaller.unmarshall(metadata, definitions).then(_graph -> {
                     final Diagram diagram = dmnDiagramFactory.build("DRG", metadata, _graph);
                     updateClientShapeSetId(diagram);
@@ -196,8 +219,9 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
 
             MainJs.unmarshall(xml, "", jsCallback);
         } catch (Exception e) {
-            GWT.log(e.getMessage(), e);
-            callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
+            DomGlobal.console.log("-------------->", e);
+//            GWT.log(e.getMessage(), e);
+//            callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
         }
     }
 
@@ -213,13 +237,12 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
             return;
         }
 
-        this.metadata = buildMetadataInstance(stunnerDiagram.getMetadata().getPath().getFileName());
+        metadata = buildMetadataInstance(stunnerDiagram.getMetadata().getPath().getFileName());
 
         final Diagram diagram = dmnDiagramFactory.build(dmnDiagram.getName().getValue(), metadata, graph);
-
         updateClientShapeSetId(diagram);
-
         callback.get().onSuccess(diagram);
+
         decisionNavigatorPresenter.enableRefreshHandlers();
         decisionNavigatorPresenter.refreshTreeView();
     }

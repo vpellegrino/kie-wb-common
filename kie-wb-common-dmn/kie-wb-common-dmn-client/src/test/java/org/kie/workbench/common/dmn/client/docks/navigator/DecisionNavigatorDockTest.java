@@ -84,9 +84,9 @@ public class DecisionNavigatorDockTest {
 
         final CanvasHandler canvasHandler = mock(CanvasHandler.class);
 
-        dock.setupCanvasHandler(canvasHandler);
+        dock.reload();
 
-        verify(decisionNavigatorPresenter).setHandler(canvasHandler);
+//        verify(decisionNavigatorPresenter).setHandler(canvasHandler);
     }
 
     @Test

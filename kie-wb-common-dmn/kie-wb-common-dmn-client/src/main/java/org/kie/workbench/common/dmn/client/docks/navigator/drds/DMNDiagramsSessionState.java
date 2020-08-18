@@ -79,7 +79,13 @@ public class DMNDiagramsSessionState {
     }
 
     Optional<DMNDiagramElement> getCurrentDMNDiagramElement() {
-        return Optional.ofNullable(currentDMNDiagramElement);
+        final Optional<DMNDiagramElement> currentDMNDiagramElement = Optional.ofNullable(this.currentDMNDiagramElement);
+
+        if (currentDMNDiagramElement.isPresent()) {
+            return currentDMNDiagramElement;
+        }
+
+        return Optional.ofNullable(getDRGDMNDiagramElement());
     }
 
     Optional<Diagram> getCurrentDiagram() {
