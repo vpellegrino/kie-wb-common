@@ -37,7 +37,6 @@ import org.mockito.Mock;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -138,20 +137,23 @@ public class DMNDiagramsSessionStateTest {
     }
 
     @Test
-    public void testSetCurrentDMNDiagramElement() {
-        sessionState.setCurrentDMNDiagramElement(dmnDiagram1);
+    public void testGetCurrentDMNDiagramElement() {
+        sessionState.setCurrentDMNDiagramElement(dmnDiagram2);
 
         final Optional<DMNDiagramElement> actual = sessionState.getCurrentDMNDiagramElement();
 
         assertTrue(actual.isPresent());
-        assertEquals(dmnDiagram1, actual.get());
+        assertEquals(dmnDiagram2, actual.get());
     }
 
     @Test
-    public void testSetCurrentDMNDiagramElementWhenCurrentDiagramIsNotPresent() {
+    public void testGetCurrentDMNDiagramElementWhenCurrentDiagramIsNotPresent() {
         sessionState.setCurrentDMNDiagramElement(null);
 
-        assertFalse(sessionState.getCurrentDMNDiagramElement().isPresent());
+        final Optional<DMNDiagramElement> actual = sessionState.getCurrentDMNDiagramElement();
+
+        assertTrue(actual.isPresent());
+        assertEquals(dmnDiagram1, actual.get()); // Returns the DRG
     }
 
     @Test
@@ -162,13 +164,6 @@ public class DMNDiagramsSessionStateTest {
 
         assertTrue(actual.isPresent());
         assertEquals(stunnerDiagram1, actual.get());
-    }
-
-    @Test
-    public void testGetCurrentDiagramWhenCurrentDiagramIsNotPresent() {
-        sessionState.setCurrentDMNDiagramElement(null);
-
-        assertFalse(sessionState.getCurrentDiagram().isPresent());
     }
 
     @Test
