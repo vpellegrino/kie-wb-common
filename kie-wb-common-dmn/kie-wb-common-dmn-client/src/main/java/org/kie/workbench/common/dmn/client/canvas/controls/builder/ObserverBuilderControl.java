@@ -31,7 +31,7 @@ import org.kie.workbench.common.dmn.api.definition.model.DMNElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.factory.DefaultCanvasCommandFactory;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.forms.adf.definitions.DynamicReadOnly;
 import org.kie.workbench.common.stunner.core.client.api.ClientDefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.impl.Observer;
@@ -49,7 +49,7 @@ import org.kie.workbench.common.stunner.core.util.StringUtils;
 @Observer
 public class ObserverBuilderControl extends org.kie.workbench.common.stunner.core.client.canvas.controls.builder.impl.ObserverBuilderControl {
 
-    private final DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+    private final DMNDiagramsSession dmnDiagramsSession;
 
     @Inject
     public ObserverBuilderControl(final ClientDefinitionManager clientDefinitionManager,
@@ -59,7 +59,7 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
                                   final ClientTranslationMessages translationMessages,
                                   final GraphBoundsIndexer graphBoundsIndexer,
                                   final Event<CanvasSelectionEvent> canvasSelectionEvent,
-                                  final DMNDiagramElementSwitcher dmnDiagramElementSwitcher) {
+                                  final DMNDiagramsSession dmnDiagramsSession) {
         super(clientDefinitionManager,
               clientFactoryServices,
               ruleManager,
@@ -67,7 +67,7 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
               translationMessages,
               graphBoundsIndexer,
               canvasSelectionEvent);
-        this.dmnDiagramElementSwitcher = dmnDiagramElementSwitcher;
+        this.dmnDiagramsSession = dmnDiagramsSession;
     }
 
     @Override
@@ -108,14 +108,13 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
             }
         }
 
-        final Optional<DMNDiagramElement> currentDMNDiagramElement = getDMNDiagramElementSwitcher().getCurrentDMNDiagramElement();
-
+        final Optional<DMNDiagramElement> currentDMNDiagramElement = getDMNDiagramsSession().getCurrentDMNDiagramElement();
         if (currentDMNDiagramElement.isPresent() && newDefinition instanceof DRGElement) {
             ((DRGElement) newDefinition).setDMNDiagramId(currentDMNDiagramElement.get().getId().getValue());
         }
     }
 
-    DMNDiagramElementSwitcher getDMNDiagramElementSwitcher() {
-        return dmnDiagramElementSwitcher;
+    DMNDiagramsSession getDMNDiagramsSession() {
+        return dmnDiagramsSession;
     }
 }
