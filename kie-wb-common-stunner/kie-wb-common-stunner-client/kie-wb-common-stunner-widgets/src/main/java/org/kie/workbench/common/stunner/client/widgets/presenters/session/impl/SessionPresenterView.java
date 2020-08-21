@@ -70,6 +70,10 @@ public class SessionPresenterView extends Composite
 
     @Inject
     @DataField
+    private FlowPanel sessionHeaderContainer;
+
+    @Inject
+    @DataField
     private FlowPanel toolbarPanel;
 
     @Inject
@@ -154,6 +158,9 @@ public class SessionPresenterView extends Composite
     }
 
     @Override
+    public IsWidget getSessionHeaderContainer() { return sessionHeaderContainer.getWidget(0); }
+
+    @Override
     public IsWidget getPaletteWidget() {
         return palettePanel.getWidget(0);
     }
@@ -167,6 +174,12 @@ public class SessionPresenterView extends Composite
     public SessionPresenterView setToolbarWidget(final IsWidget widget) {
         setWidgetForPanel(toolbarPanel,
                           widget);
+        return this;
+    }
+
+    @Override
+    public SessionPresenterView setSessionHeaderContainer(final IsWidget widget) {
+        setWidgetForPanel(sessionHeaderContainer, widget);
         return this;
     }
 
