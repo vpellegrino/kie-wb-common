@@ -29,6 +29,8 @@ import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
+import org.kie.workbench.common.dmn.client.editors.drd.DRDNameChanger;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -125,7 +127,8 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor implements Kogito
                             final IncludedModelsPage includedModelsPage,
                             final IncludedModelsPageStateProviderImpl importsPageProvider,
                             final EditorContextProvider contextProvider,
-                            final GuidedTourBridgeInitializer guidedTourBridgeInitializer) {
+                            final GuidedTourBridgeInitializer guidedTourBridgeInitializer,
+                            final DRDNameChanger drdNameChanger) {
         super(view,
               fileMenuBuilder,
               placeManager,
@@ -159,7 +162,8 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor implements Kogito
               includedModelsPage,
               importsPageProvider,
               contextProvider,
-              guidedTourBridgeInitializer);
+              guidedTourBridgeInitializer,
+              drdNameChanger);
     }
 
     @Override
@@ -196,6 +200,11 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor implements Kogito
     @Override
     public void onEditExpressionEvent(final @Observes EditExpressionEvent event) {
         super.onEditExpressionEvent(event);
+    }
+
+    @Override
+    public void setCurrentDMNDiagramElement(final @Observes DMNDiagramSelected selected) {
+        super.setCurrentDMNDiagramElement(selected);
     }
 
     @Override
