@@ -29,7 +29,6 @@ import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
 import org.kie.workbench.common.dmn.client.editors.drd.DRDNameChanger;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
@@ -200,11 +199,6 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor implements Kogito
     @Override
     public void onEditExpressionEvent(final @Observes EditExpressionEvent event) {
         super.onEditExpressionEvent(event);
-    }
-
-    @Override
-    public void setCurrentDMNDiagramElement(final @Observes DMNDiagramSelected selected) {
-        super.setCurrentDMNDiagramElement(selected);
     }
 
     @Override
