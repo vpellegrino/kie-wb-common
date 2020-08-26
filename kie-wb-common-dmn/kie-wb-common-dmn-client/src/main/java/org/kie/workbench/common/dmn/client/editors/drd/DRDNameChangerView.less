@@ -14,12 +14,35 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.editors.drd;
+[data-i18n-prefix="DRDNameChangerView."] {
+  .return-to-drg-link {
+    margin: 5px;
 
-import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
+    i {
+      padding: 0 9px 0 7px;
+    }
+  }
 
-public interface DRDNameChanger extends IsElement {
+  .drd-name-editor {
+    font-size: larger;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
 
-    void setSessionPresenterView(SessionPresenter.View sessionPresenterView);
+    .drd-name {
+      font-weight: 600;
+    }
+
+    .drd-description {
+      margin-left: 5px;
+      font-style: italic;
+      color: gray;
+    }
+
+    .drd-name-input {
+      outline: none;
+      border-color: #9adcff;
+      border-radius: 2px;
+    }
+  }
 }
