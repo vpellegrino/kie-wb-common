@@ -117,7 +117,7 @@ public class DRDNameChangerView implements DRDNameChanger {
         saveForTheCurrentDiagram();
     }
 
-    private void saveForTheCurrentDiagram() {
+    void saveForTheCurrentDiagram() {
         dmnDiagramsSession.getCurrentDMNDiagramElement().ifPresent(this::performSave);
     }
 
