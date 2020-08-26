@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.editors.drd.DRDNameChanger;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -158,6 +159,19 @@ public class DMNDiagramEditorTest {
 
     @Mock
     private ElementWrapperWidget searchBarComponentWidget;
+
+    @Mock
+    private HTMLElement drdNameChangerElement;
+
+    @Mock
+    private DRDNameChanger drdNameChanger;
+
+    @Mock
+    private ElementWrapperWidget drdNameWidget;
+
+    @Mock
+    private SessionPresenter.View sessionPresenterView;
+
     private DMNDiagramEditor editor;
 
     @Before
@@ -165,6 +179,8 @@ public class DMNDiagramEditorTest {
     public void setup() {
         when(searchBarComponent.getView()).thenReturn(searchBarComponentView);
         when(searchBarComponentView.getElement()).thenReturn(searchBarComponentViewElement);
+        when(presenter.getView()).thenReturn(sessionPresenterView);
+        when(drdNameChanger.getElement()).thenReturn(drdNameChangerElement);
         doReturn(presenter).when(presenter).withToolbar(anyBoolean());
         doReturn(presenter).when(presenter).withPalette(anyBoolean());
         doReturn(presenter).when(presenter).displayNotifications(any());
@@ -207,9 +223,11 @@ public class DMNDiagramEditorTest {
                                           null,
                                           kieView,
                                           feelInitializer,
-                                          dmnDiagramsSession));
+                                          dmnDiagramsSession,
+                                          drdNameChanger));
 
         doReturn(searchBarComponentWidget).when(editor).getWidget(searchBarComponentViewElement);
+        doReturn(drdNameWidget).when(editor).getWidget(drdNameChangerElement);
     }
 
     @Test

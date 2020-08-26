@@ -35,6 +35,7 @@ import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.editors.drd.DRDNameChanger;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -145,6 +146,7 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
     private final KieEditorWrapperView kieView;
     private final MonacoFEELInitializer feelInitializer;
     private final DMNDiagramsSession dmnDiagramsSession;
+    private final DRDNameChanger drdNameChanger;
 
     private PlaceRequest placeRequest;
     private String title = "Authoring Screen";
@@ -177,7 +179,8 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
                             final ScreenErrorView screenErrorView,
                             final KieEditorWrapperView kieView,
                             final MonacoFEELInitializer feelInitializer,
-                            final DMNDiagramsSession dmnDiagramsSession) {
+                            final DMNDiagramsSession dmnDiagramsSession,
+                            final DRDNameChanger drdNameChanger) {
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
         this.presenter = presenter;
@@ -208,6 +211,7 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
         this.kieView = kieView;
         this.feelInitializer = feelInitializer;
         this.dmnDiagramsSession = dmnDiagramsSession;
+        this.drdNameChanger = drdNameChanger;
     }
 
     @PostConstruct
@@ -225,6 +229,12 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
 
         setupEditorSearchIndex();
         setupSearchComponent();
+        setupSessionHeaderContainer();
+    }
+
+    private void setupSessionHeaderContainer() {
+        drdNameChanger.setSessionPresenterView(presenter.getView());
+        presenter.getView().setSessionHeaderContainer(getWidget(drdNameChanger.getElement()));
     }
 
     private void setupEditorSearchIndex() {

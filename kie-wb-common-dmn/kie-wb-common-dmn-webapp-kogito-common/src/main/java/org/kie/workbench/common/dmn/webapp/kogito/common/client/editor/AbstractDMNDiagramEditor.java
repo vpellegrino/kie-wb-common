@@ -232,7 +232,8 @@ public abstract class AbstractDMNDiagramEditor extends AbstractDiagramEditor {
     }
 
     private void setupSessionHeaderContainer() {
-        getSessionPresenter().getView().setSessionHeaderContainer(ElementWrapperWidget.getWidget(drdNameChanger.getElement()));
+        drdNameChanger.setSessionPresenterView(getSessionPresenter().getView());
+        getSessionPresenter().getView().setSessionHeaderContainer(getWidget(drdNameChanger.getElement()));
     }
 
     private void setupEditorSearchIndex() {
