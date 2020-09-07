@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramTuple;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.editors.contextmenu.ContextMenu;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.graph.Edge;
@@ -43,14 +44,17 @@ public class DRDContextMenu {
     private final ClientTranslationService translationService;
     private final ContextMenu contextMenu;
     private final DRDContextMenuService drdContextMenuService;
+    private final DMNDiagramsSession dmnDiagramsSession;
 
     @Inject
     public DRDContextMenu(final ContextMenu contextMenu,
                           final ClientTranslationService translationService,
-                          final DRDContextMenuService drdContextMenuService) {
+                          final DRDContextMenuService drdContextMenuService,
+                          final DMNDiagramsSession dmnDiagramsSession) {
         this.contextMenu = contextMenu;
         this.translationService = translationService;
         this.drdContextMenuService = drdContextMenuService;
+        this.dmnDiagramsSession = dmnDiagramsSession;
     }
 
     public String getTitle() {
@@ -82,9 +86,11 @@ public class DRDContextMenu {
                                         () -> drdContextMenuService.addToExistingDRD(dmnDiagram, selectedNodes));
         });
 
-        contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_REMOVE),
-                                    true,
-                                    () -> drdContextMenuService.removeFromCurrentDRD(selectedNodes));
+        if (!dmnDiagramsSession.isGlobalGraphSelected()) {
+            contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_REMOVE),
+                                        true,
+                                        () -> drdContextMenuService.removeFromCurrentDRD(selectedNodes));
+        }
     }
 
     private String getDiagramName(final DMNDiagramTuple dmnDiagram) {

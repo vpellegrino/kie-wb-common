@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramTuple;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.editors.contextmenu.ContextMenu;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -83,9 +84,12 @@ public class DRDContextMenuTest {
     @Mock
     private HTMLBodyElement body;
 
+    @Mock
+    private DMNDiagramsSession dmnDiagramsSession;
+
     @Before
     public void setUp() {
-        drdContextMenu = new DRDContextMenu(contextMenu, translationService, drdContextMenuService);
+        drdContextMenu = new DRDContextMenu(contextMenu, translationService, drdContextMenuService, dmnDiagramsSession);
     }
 
     @Test
