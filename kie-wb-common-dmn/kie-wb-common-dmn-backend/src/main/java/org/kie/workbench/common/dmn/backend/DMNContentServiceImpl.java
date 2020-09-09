@@ -33,8 +33,10 @@ import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.kie.workbench.common.dmn.api.DMNContentResource;
 import org.kie.workbench.common.dmn.api.DMNContentService;
+import org.kie.workbench.common.dmn.api.editors.included.PMMLDocumentMetadata;
 import org.kie.workbench.common.dmn.api.marshalling.DMNPathsHelper;
 import org.kie.workbench.common.dmn.backend.common.DMNIOHelper;
+import org.kie.workbench.common.dmn.backend.editors.common.PMMLIncludedDocumentFactory;
 import org.kie.workbench.common.services.backend.service.KieService;
 import org.kie.workbench.common.services.shared.project.KieModule;
 import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
@@ -53,13 +55,17 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
 
     private final DMNPathsHelper pathsHelper;
 
+    private final PMMLIncludedDocumentFactory pmmlIncludedDocumentFactory;
+
     @Inject
     public DMNContentServiceImpl(final CommentedOptionFactory commentedOptionFactory,
                                  final DMNIOHelper dmnIOHelper,
-                                 final DMNPathsHelper pathsHelper) {
+                                 final DMNPathsHelper pathsHelper,
+                                 final PMMLIncludedDocumentFactory pmmlIncludedDocumentFactory) {
         this.commentedOptionFactory = commentedOptionFactory;
         this.dmnIOHelper = dmnIOHelper;
         this.pathsHelper = pathsHelper;
+        this.pmmlIncludedDocumentFactory = pmmlIncludedDocumentFactory;
     }
 
     @Override
@@ -111,6 +117,11 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
     }
 
     @Override
+    public PMMLDocumentMetadata loadPMMLDocumentMetadata(final Path path) {
+        return pmmlIncludedDocumentFactory.getDocumentByPath(path);
+    }
+
+    @Override
     protected String constructContent(final Path path,
                                       final Overview _overview) {
         return getSource(path);
@@ -138,26 +149,13 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
                                                   final String title) {
         final Package modulePackage = moduleService.resolvePackage(path);
         final KieModule kieModule = moduleService.resolveModule(path);
-        return buildProjectMetadataInstance(path,
-                                            title,
-                                            defSetId,
-                                            kieModule.getModuleName(),
-                                            modulePackage,
-                                            overviewLoader.loadOverview(path));
-    }
-
-    private ProjectMetadata buildProjectMetadataInstance(final Path path,
-                                                         final String name,
-                                                         final String defSetId,
-                                                         final String moduleName,
-                                                         final Package projPkg,
-                                                         final Overview overview) {
+        final Overview overview = overviewLoader.loadOverview(path);
         return new ProjectMetadataImpl.ProjectMetadataBuilder()
                 .forDefinitionSetId(defSetId)
-                .forModuleName(moduleName)
-                .forProjectPackage(projPkg)
+                .forModuleName(kieModule.getModuleName())
+                .forProjectPackage(modulePackage)
                 .forOverview(overview)
-                .forTitle(name)
+                .forTitle(title)
                 .forPath(path)
                 .build();
     }
