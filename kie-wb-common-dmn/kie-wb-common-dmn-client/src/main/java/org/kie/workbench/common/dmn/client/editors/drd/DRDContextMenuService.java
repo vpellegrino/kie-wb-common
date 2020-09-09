@@ -95,9 +95,9 @@ public class DRDContextMenuService {
 
     public void addToExistingDRD(final DMNDiagramTuple dmnDiagram,
                                  final Collection<Node<? extends Definition<?>, Edge>> selectedNodes) {
-        selectedNodes.forEach(addNodesToDRD(dmnDiagram.getDMDNDiagram(), dmnDiagram.getStunnerDiagram()));
+        selectedNodes.forEach(addNodesToDRD(dmnDiagram.getDMNDiagram(), dmnDiagram.getStunnerDiagram()));
 
-        selectedEvent.fire(new DMNDiagramSelected(dmnDiagram.getDMDNDiagram()));
+        selectedEvent.fire(new DMNDiagramSelected(dmnDiagram.getDMNDiagram()));
     }
 
     @SuppressWarnings("unchecked")
@@ -197,7 +197,7 @@ public class DRDContextMenuService {
         return dmnDiagramsSession
                 .getDMNDiagrams()
                 .stream()
-                .map(e -> e.getDMDNDiagram().getName().getValue())
+                .map(e -> e.getDMNDiagram().getName().getValue())
                 .collect(Collectors.toList());
     }
 

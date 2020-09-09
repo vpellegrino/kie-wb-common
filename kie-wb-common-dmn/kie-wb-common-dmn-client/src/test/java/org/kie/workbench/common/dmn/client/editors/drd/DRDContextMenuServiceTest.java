@@ -169,7 +169,7 @@ public class DRDContextMenuServiceTest {
         final DMNDiagramElement dmnDiagram = mock(DMNDiagramElement.class);
         final Id diagramId = new Id("DIAGRAM_ID");
         when(dmnDiagramTuple.getStunnerDiagram()).thenReturn(diagram);
-        when(dmnDiagramTuple.getDMDNDiagram()).thenReturn(dmnDiagram);
+        when(dmnDiagramTuple.getDMNDiagram()).thenReturn(dmnDiagram);
         when(diagram.getGraph()).thenReturn(graph);
         when(dmnDiagram.getId()).thenReturn(diagramId);
         return dmnDiagramTuple;
