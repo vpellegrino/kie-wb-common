@@ -546,6 +546,7 @@ public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
 
         doReturn(sessionPresenter).when(diagramEditor).getSessionPresenter();
         when(sessionPresenter.getInstance()).thenReturn(dmnEditorSession);
+        when(sessionPresenter.getView()).thenReturn(sessionPresenterView);
         when(sessionManager.getCurrentSession()).thenReturn(dmnEditorSession);
 
         open();
@@ -562,6 +563,7 @@ public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
 
         doReturn(sessionPresenter).when(diagramEditor).getSessionPresenter();
         when(sessionPresenter.getInstance()).thenReturn(dmnEditorSession);
+        when(sessionPresenter.getView()).thenReturn(sessionPresenterView);
         when(sessionManager.getCurrentSession()).thenReturn(defaultEditorSession);
         when(defaultEditorSession.getExpressionEditor()).thenReturn(expressionEditor);
 
