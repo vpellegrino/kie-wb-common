@@ -16,15 +16,19 @@
 
 package org.kie.workbench.common.dmn.client.editors.drd;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.dmn.api.definition.HasText;
@@ -50,7 +54,10 @@ import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.HasContentDefinitionId;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Child;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
+import org.kie.workbench.common.stunner.core.graph.content.view.Point2DConnection;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnectorImpl;
 import org.kie.workbench.common.stunner.core.graph.impl.EdgeImpl;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
@@ -96,7 +103,7 @@ public class DRDContextMenuService {
         final DMNDiagramElement dmnElement = makeDmnDiagramElement();
         final Diagram stunnerElement = buildStunnerElement(dmnElement);
 
-        selectedNodes.forEach(addNodesToDRD(dmnElement, stunnerElement));
+        processNodes(selectedNodes, dmnElement, stunnerElement);
 
         addDmnDiagramElementToDRG(dmnElement);
 
@@ -106,15 +113,24 @@ public class DRDContextMenuService {
 
     public void addToExistingDRD(final DMNDiagramTuple dmnDiagram,
                                  final Collection<Node<? extends Definition<?>, Edge>> selectedNodes) {
-        selectedNodes.forEach(addNodesToDRD(dmnDiagram.getDMNDiagram(), dmnDiagram.getStunnerDiagram()));
+        processNodes(selectedNodes, dmnDiagram.getDMNDiagram(), dmnDiagram.getStunnerDiagram());
 
         selectedEvent.fire(new DMNDiagramSelected(dmnDiagram.getDMNDiagram()));
     }
 
+    private void processNodes(final Collection<Node<? extends Definition<?>, Edge>> selectedNodes, final DMNDiagramElement dmnElement, final Diagram stunnerElement) {
+        Map<String, Node> clonedSelectedNodesMap = new HashMap<>();
+        selectedNodes.forEach(node -> addNodesToDRD(node, dmnElement, stunnerElement)
+                        .ifPresent(clonedNode -> clonedSelectedNodesMap.put(node.getUUID(), clonedNode)));
+
+        selectedNodes.forEach(selectedNode ->
+                                      cloneOutEdges(clonedSelectedNodesMap, selectedNode.getUUID(), selectedNode.getOutEdges()));
+    }
+
     @SuppressWarnings("unchecked")
-    private Consumer<Node<? extends Definition<?>, Edge>> addNodesToDRD(final DMNDiagramElement dmnElement,
-                                                                        final Diagram stunnerElement) {
-        return node -> {
+    private Optional<Node> addNodesToDRD(final Node<? extends Definition<?>, Edge> node,
+                                         final DMNDiagramElement dmnElement,
+                                         final Diagram stunnerElement) {
             final Definition<?> content = node.getContent();
             final Object definition = ((View) content).getDefinition();
             if (definition instanceof HasContentDefinitionId) {
@@ -126,8 +142,10 @@ public class DRDContextMenuService {
                 stunnerElement
                         .getGraph()
                         .addNode(clone);
+
+                return Optional.of(clone);
             }
-        };
+            return Optional.empty();
     }
 
     private void connectRootWithChild(final Node dmnDiagramRoot,
@@ -139,6 +157,31 @@ public class DRDContextMenuService {
         final Definitions definitions = ((DMNDiagram) ((View) dmnDiagramRoot.getContent()).getDefinition()).getDefinitions();
         final DMNModelInstrumentedBase childDRG = (DMNModelInstrumentedBase) ((View) child.getContent()).getDefinition();
         childDRG.setParent(definitions);
+    }
+
+    private Collection<Edge> cloneOutEdges(final Map<String, Node> clonedSelectedNodesMap, final String sourceNodeUUID, final List<Edge> outEdges) {
+        return outEdges
+                .stream()
+                .filter(edge -> edge.getContent() instanceof View)
+                .filter(edge -> clonedSelectedNodesMap.containsKey(edge.getTargetNode().getUUID()))
+                .map(edge -> {
+                    final ViewConnectorImpl<Object>  edgeContentView = (ViewConnectorImpl<Object> ) edge.getContent();
+                    final Edge clonedEdge = new EdgeImpl<>(UUID.uuid());
+                    ViewConnectorImpl<Object> clonedEdgeContent = new ViewConnectorImpl<>(
+                            dmnDeepCloneProcess.clone(edgeContentView.getDefinition()),
+                            cloneBounds(edgeContentView.getBounds())
+                    );
+                    edgeContentView.getSourceConnection().ifPresent(sourceConnection -> clonedEdgeContent.setSourceConnection(new Point2DConnection(sourceConnection.getLocation())));
+                    edgeContentView.getTargetConnection().ifPresent(targetConnection -> clonedEdgeContent.setTargetConnection(new Point2DConnection(targetConnection.getLocation())));
+                    clonedEdgeContent.setControlPoints(Arrays.stream(edgeContentView.getControlPoints()).map(controlPoint -> ControlPoint.build(controlPoint.getLocation())).toArray(ControlPoint[]::new));
+
+                    connectEdge(clonedEdge, clonedSelectedNodesMap.get(sourceNodeUUID), clonedSelectedNodesMap.get(edge.getTargetNode().getUUID()));
+                    clonedEdge.setContent(clonedEdgeContent);
+                    DomGlobal.console.log(edgeContentView.getBounds(), ((View) clonedEdge.getContent()).getBounds());
+                    DomGlobal.console.log(edge, clonedEdge);
+                    return clonedEdge;
+                })
+                .collect(Collectors.toList());
     }
 
     private void connectEdge(final Edge edge,
