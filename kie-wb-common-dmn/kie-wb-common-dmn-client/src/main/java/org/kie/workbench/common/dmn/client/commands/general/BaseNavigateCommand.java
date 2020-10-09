@@ -23,11 +23,10 @@ import javax.enterprise.event.Event;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.ui.Widget;
-import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
+import org.kie.workbench.common.dmn.client.reactpoc.ReactPanel;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.AbstractSessionPresenter;
@@ -131,7 +130,8 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
     // defined on the editor.getElement() and hence RequiresResize is lost.
     // Wrap the editor in a ResizeFlowPanel to support RequiresResize.
     protected ResizeFlowPanel wrapElementForErrai1090() {
-        final Widget w = ElementWrapperWidget.getWidget(editor.getElement());
+        final String containerId = "dmn-expression-editor-container";
+        final ReactPanel reactPanel = new ReactPanel(containerId);
         final ResizeFlowPanel container = new ResizeFlowPanel() {
 
             @Override
@@ -140,11 +140,11 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
                 editor.getView().onResize();
             }
         };
-        container.getElement().setId("dmn-expression-editor-container");
+        container.getElement().setId(containerId);
         container.getElement().getStyle().setDisplay(Style.Display.FLEX);
         container.getElement().getStyle().setWidth(100.0, Style.Unit.PCT);
         container.getElement().getStyle().setHeight(100.0, Style.Unit.PCT);
-        container.add(w);
+        container.add(reactPanel);
 
         return container;
     }
