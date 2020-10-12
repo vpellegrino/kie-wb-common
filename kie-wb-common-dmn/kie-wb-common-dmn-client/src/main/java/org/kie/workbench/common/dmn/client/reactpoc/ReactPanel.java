@@ -59,7 +59,7 @@ public class ReactPanel extends Composite {
     public static native void renderComponent(String divId, InputProperty inputProperty);
 
     @JsMethod(namespace = JsPackage.GLOBAL)
-    public static void printExternalText(String text) {
-        DomGlobal.console.log(text);
+    public static void printExternalText(ExternalObject externalObject) {
+        DomGlobal.console.log(externalObject.getName());
     }
 }
