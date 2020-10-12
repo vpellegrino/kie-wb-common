@@ -52,9 +52,9 @@ public class ReactPanel extends Composite {
     @Override
     protected void onLoad() {
         super.onLoad();
-        renderComponent(containerId);
+        renderComponent(containerId, new InputProperty("testing properties..."));
     }
 
     @JsMethod(namespace = JsPackage.GLOBAL)
-    public static native void renderComponent(String divId);
+    public static native void renderComponent(String divId, InputProperty inputProperty);
 }
