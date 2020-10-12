@@ -55,9 +55,17 @@ public class ReactPanel extends Composite {
         renderComponent(containerId, new InputProperty("testing properties..."));
     }
 
+    /*
+        Calling a function exposed by the React APP in the `window` namespace
+        on JS: renderComponent('gwt-uid-13', {name: 'whatever input'})
+     */
     @JsMethod(namespace = JsPackage.GLOBAL)
     public static native void renderComponent(String divId, InputProperty inputProperty);
 
+    /*
+        Exposing a function (on GWT side) to be called by the React APP (passing an external object)
+        on JS: printExternalText({name: 'text you want'})
+     */
     @JsMethod(namespace = JsPackage.GLOBAL)
     public static void printExternalText(ExternalObject externalObject) {
         DomGlobal.console.log(externalObject.getName());
