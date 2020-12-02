@@ -18,44 +18,59 @@ import { ExpressionContainer } from "../../../components/ExpressionContainer";
 import { render } from "@testing-library/react";
 import * as React from "react";
 import { usingTestingBoxedExpressionI18nContext } from "../test-utils";
+import { DataType, LogicType } from "../../../api";
 
 describe("ExpressionContainer tests", () => {
   test("should render ExpressionContainer component", () => {
-    const { container } = render(usingTestingBoxedExpressionI18nContext(<ExpressionContainer name="Test" />).wrapper);
+    const expression = { name: "Test", dataType: DataType.Undefined };
+
+    const { container } = render(
+      usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
+    );
 
     expect(container).toMatchSnapshot();
   });
 
   test("should render expression title, when name prop is passed", () => {
     const expressionTitle = "Test";
+    const expression = { name: expressionTitle, dataType: DataType.Undefined };
+
     const { container } = render(
-      usingTestingBoxedExpressionI18nContext(<ExpressionContainer name={expressionTitle} />).wrapper
+      usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
     );
-    expect(container.querySelector("#expression-title")).toBeTruthy();
-    expect(container.querySelector("#expression-title")!.innerHTML).toBe(expressionTitle);
+    expect(container.querySelector(".expression-title")).toBeTruthy();
+    expect(container.querySelector(".expression-title")!.innerHTML).toBe(expressionTitle);
   });
 
   test("should render expression type, when type prop is passed", () => {
-    const type = "TYPE";
+    const expression = { name: "Test", logicType: LogicType.Context, dataType: DataType.Undefined };
     const { container } = render(
-      usingTestingBoxedExpressionI18nContext(<ExpressionContainer name="Test" type={type} />).wrapper
+      usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
     );
 
-    expect(container.querySelector("#expression-type")).toBeTruthy();
-    expect(container.querySelector("#expression-type")!.innerHTML).toBe("(" + type + ")");
+    expect(container.querySelector(".expression-type")).toBeTruthy();
+    expect(container.querySelector(".expression-type")!.innerHTML).toBe("(" + LogicType.Context + ")");
   });
 
   test("should render expression type as undefined, when type prop is not passed", () => {
-    const { container } = render(usingTestingBoxedExpressionI18nContext(<ExpressionContainer name="Test" />).wrapper);
-    expect(container.querySelector("#expression-type")).toBeTruthy();
-    expect(container.querySelector("#expression-type")!.innerHTML).toBe("(&lt;Undefined&gt;)");
+    const expression = { name: "Test", dataType: DataType.Undefined };
+
+    const { container } = render(
+      usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
+    );
+    expect(container.querySelector(".expression-type")).toBeTruthy();
+    expect(container.querySelector(".expression-type")!.innerHTML).toBe("(&lt;Undefined&gt;)");
   });
 
   describe("Expression Actions dropdown", () => {
     test("should have the clear action disabled on startup", () => {
-      const { container } = render(usingTestingBoxedExpressionI18nContext(<ExpressionContainer name="Test" />).wrapper);
+      const expression = { name: "Test", dataType: DataType.Undefined };
 
-      const actionsToggleElement = container.querySelector("#expression-actions-toggle")!;
+      const { container } = render(
+        usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
+      );
+
+      const actionsToggleElement = container.querySelector(".expression-actions-toggle")!;
       const actionsToggleButton = actionsToggleElement as HTMLButtonElement;
       actionsToggleButton.click();
 
@@ -64,13 +79,13 @@ describe("ExpressionContainer tests", () => {
     });
 
     test("should have the clear action enabled, when logic type is selected", () => {
+      const expression = { name: "Test", logicType: LogicType.LiteralExpression, dataType: DataType.Undefined };
+
       const { container } = render(
-        usingTestingBoxedExpressionI18nContext(
-          <ExpressionContainer name="Test" selectedExpression="Literal expression" />
-        ).wrapper
+        usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
       );
 
-      const actionsToggleElement = container.querySelector("#expression-actions-toggle")!;
+      const actionsToggleElement = container.querySelector(".expression-actions-toggle")!;
       const actionsToggleButton = actionsToggleElement as HTMLButtonElement;
       actionsToggleButton.click();
 
@@ -82,26 +97,24 @@ describe("ExpressionContainer tests", () => {
 
   describe("Logic type selection", () => {
     test("should show the pre-selection, when logic type prop is passed", () => {
-      const expressionBoxContent = "Literal expression";
+      const expression = { name: "Test", logicType: LogicType.Context, dataType: DataType.Undefined };
+
       const { container } = render(
-        usingTestingBoxedExpressionI18nContext(
-          <ExpressionContainer name="Test" selectedExpression={expressionBoxContent} />
-        ).wrapper
+        usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
       );
 
-      expect(container.querySelector("#expression-container-box")).toBeTruthy();
-      expect(container.querySelector("#expression-container-box")!.innerHTML).toBe(expressionBoxContent);
+      expect(container.querySelector(".expression-container-box")).toBeTruthy();
+      expect(container.querySelector(".expression-container-box")!.innerHTML).toBe(expression.logicType);
     });
 
     test("should reset the selection, when logic type is selected and clear button gets clicked", () => {
-      const expressionBoxContent = "Literal expression";
+      const expression = { name: "Test", logicType: LogicType.LiteralExpression, dataType: DataType.Undefined };
+
       const { container } = render(
-        usingTestingBoxedExpressionI18nContext(
-          <ExpressionContainer name="Test" selectedExpression={expressionBoxContent} />
-        ).wrapper
+        usingTestingBoxedExpressionI18nContext(<ExpressionContainer selectedExpression={expression} />).wrapper
       );
 
-      const actionsToggleElement = container.querySelector("#expression-actions-toggle")!;
+      const actionsToggleElement = container.querySelector(".expression-actions-toggle")!;
       const actionsToggleButton = actionsToggleElement as HTMLButtonElement;
       actionsToggleButton.click();
 
@@ -109,8 +122,8 @@ describe("ExpressionContainer tests", () => {
       const clearAnchor = clearElement as HTMLAnchorElement;
       clearAnchor.click();
 
-      expect(container.querySelector("#expression-container-box")).toBeTruthy();
-      expect(container.querySelector("#expression-container-box")!.innerHTML).not.toBe(expressionBoxContent);
+      expect(container.querySelector(".expression-container-box")).toBeTruthy();
+      expect(container.querySelector(".expression-container-box")!.innerHTML).not.toBe(expression.logicType);
     });
   });
 });
