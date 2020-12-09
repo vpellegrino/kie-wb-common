@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "7bb5e3d94342bbbe811bedb0e516dbb7",
+    "revision": "ab894a1fe2731ba94314f1a1d18b6a0a",
     "url": "/kie-wb-common/index.html"
   },
   {
-    "revision": "be24f68b68159eac926e",
+    "revision": "d94fb7da6f76204bc0f0",
     "url": "/kie-wb-common/static/css/2.37a5b11d.chunk.css"
   },
   {
-    "revision": "e48e36574c96a06c2c37",
-    "url": "/kie-wb-common/static/css/main.bfe3ac77.chunk.css"
+    "revision": "7c88aa45abe38d4e4cf1",
+    "url": "/kie-wb-common/static/css/main.c9c47953.chunk.css"
   },
   {
-    "revision": "be24f68b68159eac926e",
-    "url": "/kie-wb-common/static/js/2.238c4324.chunk.js"
+    "revision": "d94fb7da6f76204bc0f0",
+    "url": "/kie-wb-common/static/js/2.81975f15.chunk.js"
   },
   {
-    "revision": "e48e36574c96a06c2c37",
-    "url": "/kie-wb-common/static/js/main.cd8a7f21.chunk.js"
+    "revision": "7c88aa45abe38d4e4cf1",
+    "url": "/kie-wb-common/static/js/main.04204b96.chunk.js"
   },
   {
     "revision": "71e0d44c6ad508d1b6b6",
