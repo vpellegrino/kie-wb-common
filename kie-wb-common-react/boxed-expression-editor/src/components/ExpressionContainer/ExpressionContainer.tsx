@@ -41,10 +41,10 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
 ) => {
   const { i18n } = useBoxedExpressionEditorI18n();
 
-  const [logicTypeIsPresent, setLogicTypeSelected] = useState(
+  const [logicTypeSelected, setLogicTypeSelected] = useState(
     !_.isEmpty(props.selectedExpression.logicType) || props.selectedExpression.logicType === LogicType.Undefined
   );
-  const [actionDropdownIsOpen, setActionDropDownOpen] = useState(false);
+  const [actionDropdownOpen, setActionDropDownOpen] = useState(false);
   const [selectedExpression, setSelectedExpression] = useState(props.selectedExpression);
 
   const onLogicTypeSelect = useCallback(
@@ -88,10 +88,10 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
       <Dropdown
         onSelect={onExpressionActionDropdownSelect}
         toggle={<KebabToggle onToggle={onDropdownToggle} className="expression-actions-toggle" />}
-        isOpen={actionDropdownIsOpen}
+        isOpen={actionDropdownOpen}
         isPlain
         dropdownItems={[
-          <DropdownItem key="clear" onClick={executeClearAction} isDisabled={!logicTypeIsPresent}>
+          <DropdownItem key="clear" onClick={executeClearAction} isDisabled={!logicTypeSelected}>
             {i18n.clear}
           </DropdownItem>,
         ]}
@@ -101,8 +101,8 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
     i18n.clear,
     onExpressionActionDropdownSelect,
     onDropdownToggle,
-    actionDropdownIsOpen,
-    logicTypeIsPresent,
+    actionDropdownOpen,
+    logicTypeSelected,
     executeClearAction,
   ]);
 
@@ -164,12 +164,12 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
       <span className="expression-actions">{renderExpressionActionsDropdown()}</span>
 
       <div
-        className={`expression-container-box ${logicTypeIsPresent ? "logic-type-selected" : "logic-type-not-present"}`}
+        className={`expression-container-box ${logicTypeSelected ? "logic-type-selected" : "logic-type-not-present"}`}
       >
         {selectedExpression.logicType ? renderSelectedExpression : i18n.selectExpression}
       </div>
 
-      {!logicTypeIsPresent ? buildLogicSelectorMenu() : null}
+      {!logicTypeSelected ? buildLogicSelectorMenu() : null}
     </div>
   );
 };
