@@ -35,7 +35,7 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
 ) => {
   const { i18n } = useBoxedExpressionEditorI18n();
 
-  const [logicTypeIsPresent, setLogicTypeSelected] = useState(
+  const [logicTypeSelected, setLogicTypeSelected] = useState(
     !_.isEmpty(props.selectedExpression.logicType) || props.selectedExpression.logicType === LogicType.Undefined
   );
   const [selectedExpression, setSelectedExpression] = useState(props.selectedExpression);
@@ -69,9 +69,7 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
         dataType: previousSelectedExpression.dataType,
         logicType: LogicType.Undefined,
       };
-      if (window.beeApi?.resetExpressionDefinition) {
-        window.beeApi.resetExpressionDefinition(updatedExpression);
-      }
+      window.beeApi?.resetExpressionDefinition?.(updatedExpression);
       return updatedExpression;
     });
   }, [setContextMenuVisibility]);
@@ -137,7 +135,7 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
         }}
       >
         <Button
-          isDisabled={!logicTypeIsPresent}
+          isDisabled={!logicTypeSelected}
           isSmall={true}
           variant={ButtonVariant.primary}
           onClick={executeClearAction}
@@ -146,7 +144,7 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
         </Button>
       </div>
     );
-  }, [logicTypeIsPresent, contextMenuXPos, contextMenuYPos, executeClearAction, i18n.clear]);
+  }, [logicTypeSelected, contextMenuXPos, contextMenuYPos, executeClearAction, i18n.clear]);
 
   return (
     <div className="expression-container">
@@ -154,13 +152,13 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
       <span className="expression-type">({selectedExpression.logicType || LogicType.Undefined})</span>
 
       <div
-        className={`expression-container-box ${logicTypeIsPresent ? "logic-type-selected" : "logic-type-not-present"}`}
+        className={`expression-container-box ${logicTypeSelected ? "logic-type-selected" : "logic-type-not-present"}`}
         ref={contextMenuRef}
       >
         {selectedExpression.logicType ? renderSelectedExpression : i18n.selectExpression}
       </div>
 
-      {!logicTypeIsPresent ? buildLogicSelectorMenu() : null}
+      {!logicTypeSelected ? buildLogicSelectorMenu() : null}
       {contextMenuIsVisible ? buildContextMenu() : null}
     </div>
   );
