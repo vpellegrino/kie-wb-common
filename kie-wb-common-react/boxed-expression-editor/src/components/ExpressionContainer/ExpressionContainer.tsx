@@ -40,13 +40,13 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
   );
   const [selectedExpression, setSelectedExpression] = useState(props.selectedExpression);
 
-  const [
+  const {
     contextMenuRef,
     contextMenuXPos,
     contextMenuYPos,
-    contextMenuIsVisible,
+    contextMenuVisibility,
     setContextMenuVisibility,
-  ] = useContextMenuHandler();
+  } = useContextMenuHandler();
 
   const onLogicTypeSelect = useCallback(
     (currentItem: React.RefObject<HTMLButtonElement>, currentItemProps: SimpleListItemProps) => {
@@ -159,7 +159,7 @@ export const ExpressionContainer: ({ selectedExpression }: ExpressionContainerPr
       </div>
 
       {!logicTypeSelected ? buildLogicSelectorMenu() : null}
-      {contextMenuIsVisible ? buildContextMenu() : null}
+      {contextMenuVisibility ? buildContextMenu() : null}
     </div>
   );
 };
