@@ -14,30 +14,4 @@
  * limitations under the License.
  */
 
-.literal-expression {
-  width: 300px;
-}
-
-.literal-expression .literal-expression-header {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px;
-  border-style: ridge;
-  background-color: #DEF3FF;
-  color: black;
-  cursor: pointer;
-}
-
-.literal-expression .literal-expression-header:active {
-  border: 2px solid black;
-}
-
-.literal-expression .literal-expression-header .expression-data-type {
-   font-style: normal;
-}
-
-.literal-expression .literal-expression-body {
-
-}
+export * from "./Hooks";
