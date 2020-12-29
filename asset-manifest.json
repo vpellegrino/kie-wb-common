@@ -1,27 +1,26 @@
 {
   "files": {
-    "main.css": "/kie-wb-common/static/css/main.b9b71575.chunk.css",
-    "main.js": "/kie-wb-common/static/js/main.80d43e2f.chunk.js",
-    "main.js.map": "/kie-wb-common/static/js/main.80d43e2f.chunk.js.map",
-    "runtime-main.js": "/kie-wb-common/static/js/runtime-main.b79d2ee1.js",
-    "runtime-main.js.map": "/kie-wb-common/static/js/runtime-main.b79d2ee1.js.map",
-    "static/css/2.37a5b11d.chunk.css": "/kie-wb-common/static/css/2.37a5b11d.chunk.css",
-    "static/js/2.8dbc96f3.chunk.js": "/kie-wb-common/static/js/2.8dbc96f3.chunk.js",
-    "static/js/2.8dbc96f3.chunk.js.map": "/kie-wb-common/static/js/2.8dbc96f3.chunk.js.map",
+    "main.css": "/kie-wb-common/static/css/main.d142a5e6.chunk.css",
+    "main.js": "/kie-wb-common/static/js/main.39ce295c.chunk.js",
+    "main.js.map": "/kie-wb-common/static/js/main.39ce295c.chunk.js.map",
+    "runtime-main.js": "/kie-wb-common/static/js/runtime-main.b1b4674b.js",
+    "runtime-main.js.map": "/kie-wb-common/static/js/runtime-main.b1b4674b.js.map",
+    "static/css/2.b6b6f53e.chunk.css": "/kie-wb-common/static/css/2.b6b6f53e.chunk.css",
+    "static/js/2.8709514a.chunk.js": "/kie-wb-common/static/js/2.8709514a.chunk.js",
+    "static/js/2.8709514a.chunk.js.map": "/kie-wb-common/static/js/2.8709514a.chunk.js.map",
     "index.html": "/kie-wb-common/index.html",
-    "precache-manifest.f3cdbd0afb078b080181aec14f0c513d.js": "/kie-wb-common/precache-manifest.f3cdbd0afb078b080181aec14f0c513d.js",
-    "service-worker.js": "/kie-wb-common/service-worker.js",
-    "static/css/2.37a5b11d.chunk.css.map": "/kie-wb-common/static/css/2.37a5b11d.chunk.css.map",
-    "static/css/main.b9b71575.chunk.css.map": "/kie-wb-common/static/css/main.b9b71575.chunk.css.map",
-    "static/media/base.css": "/kie-wb-common/static/media/pficon.ed74f359.woff",
-    "static/media/background-image.css": "/kie-wb-common/static/media/pfbg_768@2x.0099dea3.jpg",
-    "static/media/about-modal-box.css": "/kie-wb-common/static/media/pfbg_992@2x.1423e11e.jpg"
+    "static/css/2.b6b6f53e.chunk.css.map": "/kie-wb-common/static/css/2.b6b6f53e.chunk.css.map",
+    "static/css/main.d142a5e6.chunk.css.map": "/kie-wb-common/static/css/main.d142a5e6.chunk.css.map",
+    "static/js/2.8709514a.chunk.js.LICENSE.txt": "/kie-wb-common/static/js/2.8709514a.chunk.js.LICENSE.txt",
+    "static/media/base.css": "/kie-wb-common/static/media/pficon.eae21d83.woff",
+    "static/media/background-image.css": "/kie-wb-common/static/media/pfbg_768@2x.eea28e73.jpg",
+    "static/media/about-modal-box.css": "/kie-wb-common/static/media/pfbg_992@2x.30e8d31f.jpg"
   },
   "entrypoints": [
-    "static/js/runtime-main.b79d2ee1.js",
-    "static/css/2.37a5b11d.chunk.css",
-    "static/js/2.8dbc96f3.chunk.js",
-    "static/css/main.b9b71575.chunk.css",
-    "static/js/main.80d43e2f.chunk.js"
+    "static/js/runtime-main.b1b4674b.js",
+    "static/css/2.b6b6f53e.chunk.css",
+    "static/js/2.8709514a.chunk.js",
+    "static/css/main.d142a5e6.chunk.css",
+    "static/js/main.39ce295c.chunk.js"
   ]
 }
