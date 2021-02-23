@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
 import elemental2.dom.DomGlobal;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
+import org.kie.workbench.common.dmn.client.reactpoc.expression.props.ExpressionProps;
+import org.kie.workbench.common.dmn.client.reactpoc.expression.props.LiteralExpressionProps;
 
 public class ReactPanel extends Composite {
     interface ViewBinder extends UiBinder<Widget, ReactPanel> {
@@ -52,7 +54,7 @@ public class ReactPanel extends Composite {
     @Override
     protected void onLoad() {
         super.onLoad();
-        renderComponent(containerId, new InputProperty("testing properties..."));
+        renderBoxedExpressionEditor(containerId, new LiteralExpressionProps("Expression Name", "boolean", "expression content"));
     }
 
     /*
@@ -60,7 +62,7 @@ public class ReactPanel extends Composite {
         on JS: renderComponent('gwt-uid-13', {name: 'whatever input'})
      */
     @JsMethod(namespace = JsPackage.GLOBAL)
-    public static native void renderComponent(String divId, InputProperty inputProperty);
+    public static native void renderBoxedExpressionEditor(String divId, ExpressionProps expressionProps);
 
     /*
         Exposing a function (on GWT side) to be called by the React APP (passing an external object)
