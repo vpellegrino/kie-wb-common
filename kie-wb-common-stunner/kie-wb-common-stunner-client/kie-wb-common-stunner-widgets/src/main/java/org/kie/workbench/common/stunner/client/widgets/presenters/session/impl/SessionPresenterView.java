@@ -24,9 +24,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ScrollEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
@@ -101,7 +99,7 @@ public class SessionPresenterView extends Composite
     private double headerInitialTop;
     private double headerInitialLeft;
     private double sessionHeaderHeight;
-    private HandlerRegistration handlerRegistration;
+//    private HandlerRegistration handlerRegistration;
     private final AtomicBoolean notifying = new AtomicBoolean(false);
 
     @PostConstruct
@@ -112,11 +110,11 @@ public class SessionPresenterView extends Composite
         settings.setAllowDismiss(true);
         settings.setDelay(DELAY);
         settings.setAnimation(Animation.NO_ANIMATION, Animation.FADE_OUT);
-        handlerRegistration = addDomHandler((e) -> {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                            },
-                                            ContextMenuEvent.getType());
+//        handlerRegistration = addDomHandler((e) -> {
+//                                                e.preventDefault();
+//                                                e.stopPropagation();
+//                                            },
+//                                            ContextMenuEvent.getType());
 
         addAttachHandler(event -> {
             if (event.isAttached()) {
@@ -318,8 +316,8 @@ public class SessionPresenterView extends Composite
     }
 
     public void destroy() {
-        handlerRegistration.removeHandler();
-        handlerRegistration = null;
+//        handlerRegistration.removeHandler();
+//        handlerRegistration = null;
         loadingPanel.removeFromParent();
         toolbarPanel.clear();
         toolbarPanel.removeFromParent();
