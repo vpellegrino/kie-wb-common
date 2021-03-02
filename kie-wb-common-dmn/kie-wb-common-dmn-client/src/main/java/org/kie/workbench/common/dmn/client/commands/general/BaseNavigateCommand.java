@@ -145,6 +145,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
         container.getElement().getStyle().setWidth(100.0, Style.Unit.PCT);
         container.getElement().getStyle().setHeight(100.0, Style.Unit.PCT);
         container.getElement().getStyle().setPadding(10, Style.Unit.PX);
+        container.getElement().getStyle().setOverflow(Style.Overflow.AUTO);
         container.add(reactPanel);
 
         return container;
