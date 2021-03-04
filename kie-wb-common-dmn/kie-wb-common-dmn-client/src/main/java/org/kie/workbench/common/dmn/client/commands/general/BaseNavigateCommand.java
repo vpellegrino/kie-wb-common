@@ -44,6 +44,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
 
     static final NoOperationGraphCommand NOP_GRAPH_COMMAND = new NoOperationGraphCommand();
 
+    protected final ReactPanel reactPanel;
     protected final ExpressionEditorView.Presenter editor;
     protected final SessionPresenter<? extends ClientSession, ?, Diagram> presenter;
     protected final SessionManager sessionManager;
@@ -65,6 +66,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
                                final Optional<HasName> hasName,
                                final boolean isOnlyVisualChangeAllowed) {
         this.editor = editor;
+        this.reactPanel = new ReactPanel();
         this.presenter = presenter;
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
@@ -131,7 +133,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
     // Wrap the editor in a ResizeFlowPanel to support RequiresResize.
     protected ResizeFlowPanel wrapElementForErrai1090() {
         final String containerId = "dmn-expression-editor-container";
-        final ReactPanel reactPanel = new ReactPanel(containerId);
+        reactPanel.setContainerId(containerId);
         final ResizeFlowPanel container = new ResizeFlowPanel() {
 
             @Override
