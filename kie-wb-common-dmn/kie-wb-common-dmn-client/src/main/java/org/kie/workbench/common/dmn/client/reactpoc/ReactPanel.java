@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.reactpoc;
 
+import java.util.Optional;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,24 +26,32 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import elemental2.dom.DomGlobal;
-import jsinterop.annotations.JsMethod;
-import jsinterop.annotations.JsPackage;
-import org.kie.workbench.common.dmn.client.reactpoc.expression.props.ExpressionProps;
+import org.kie.workbench.common.dmn.api.definition.HasExpression;
+import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.dmn.client.reactpoc.expression.props.LiteralExpressionProps;
 
 public class ReactPanel extends Composite {
+
+    private String containerId;
+    private String nodeUUID;
+    private HasExpression hasExpression;
+    private Optional<HasName> hasName;
+    private boolean isOnlyVisualChangeAllowed;
+
     interface ViewBinder extends UiBinder<Widget, ReactPanel> {
 
     }
 
-    private final String containerId;
+    public ReactPanel() {
+        //empty constructor for injection
+    }
 
     private static ViewBinder uiBinder = GWT.create(ViewBinder.class);
 
     @UiField
     ScrollPanel content;
 
-    public ReactPanel(final String containerId) {
+    public void setContainerId(final String containerId) {
         this.containerId = containerId;
         initWidget(uiBinder.createAndBindUi(this));
         content.setWidth(Window.getClientWidth() + "px");
@@ -54,22 +64,19 @@ public class ReactPanel extends Composite {
     @Override
     protected void onLoad() {
         super.onLoad();
-        renderBoxedExpressionEditor(containerId, new LiteralExpressionProps("Expression Name", "boolean", "expression content"));
+        BoxedExpressionService.renderBoxedExpressionEditor(containerId, new LiteralExpressionProps("Expression Name", "boolean", "expression content"));
+        BoxedExpressionService.registerBroadcastForExpression(this);
     }
 
-    /*
-        Calling a function exposed by the React APP in the `window` namespace
-        on JS: renderComponent('gwt-uid-13', {name: 'whatever input'})
-     */
-    @JsMethod(namespace = JsPackage.GLOBAL)
-    public static native void renderBoxedExpressionEditor(String divId, ExpressionProps expressionProps);
+    public void setExpression(String nodeUUID, HasExpression hasExpression, Optional<HasName> hasName, boolean isOnlyVisualChangeAllowed) {
+        DomGlobal.console.log("set expression");
+        this.nodeUUID = nodeUUID;
+        this.hasExpression = hasExpression;
+        this.hasName = hasName;
+        this.isOnlyVisualChangeAllowed = isOnlyVisualChangeAllowed;
+    }
 
-    /*
-        Exposing a function (on GWT side) to be called by the React APP (passing an external object)
-        on JS: printExternalText({name: 'text you want'})
-     */
-    @JsMethod(namespace = JsPackage.GLOBAL)
-    public static void printExternalText(ExternalObject externalObject) {
-        DomGlobal.console.log(externalObject.getName());
+    public void broadcastLiteralExpressionDefinition(LiteralExpressionProps literalExpressionProps) {
+        DomGlobal.console.log(literalExpressionProps);
     }
 }
