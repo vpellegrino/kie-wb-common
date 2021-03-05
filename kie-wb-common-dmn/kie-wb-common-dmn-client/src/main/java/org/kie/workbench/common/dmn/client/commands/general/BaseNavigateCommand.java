@@ -66,7 +66,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
                                final Optional<HasName> hasName,
                                final boolean isOnlyVisualChangeAllowed) {
         this.editor = editor;
-        this.reactPanel = new ReactPanel();
+        this.reactPanel = new ReactPanel(sessionManager, refreshFormPropertiesEvent);
         this.presenter = presenter;
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
