@@ -17,19 +17,13 @@
 package org.kie.workbench.common.dmn.client.reactpoc.expression.props;
 
 import jsinterop.annotations.JsType;
-import jsinterop.base.Js;
 
 @JsType
 public class LiteralExpressionProps extends ExpressionProps{
-    private final String content;
+    public final String content;
 
     public LiteralExpressionProps(final String name, final String dataType, final String content) {
         super(name, dataType, "Literal expression");
         this.content = content;
-        Js.asPropertyMap(this).set("content", content);
-    }
-
-    public String getContent() {
-        return content;
     }
 }

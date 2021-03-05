@@ -74,9 +74,7 @@ public class NavigateToExpressionEditorCommand extends BaseNavigateCommand imple
                 enableHandlers(false);
                 hidePaletteWidget(true);
                 reactPanel.setExpression(nodeUUID,
-                                         hasExpression,
-                                         hasName,
-                                         isOnlyVisualChangeAllowed);
+                                         hasExpression);
                 editor.setExpression(nodeUUID,
                                      hasExpression,
                                      hasName,

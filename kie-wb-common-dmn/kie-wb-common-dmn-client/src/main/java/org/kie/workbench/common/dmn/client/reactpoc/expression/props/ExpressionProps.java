@@ -17,35 +17,19 @@
 package org.kie.workbench.common.dmn.client.reactpoc.expression.props;
 
 import jsinterop.annotations.JsType;
-import jsinterop.base.Js;
 
 @JsType
 public class ExpressionProps {
 
-    private final String name;
+    public final String name;
 
-    private final String dataType;
+    public final String dataType;
 
-    private final String logicType;
+    public final String logicType;
 
     public ExpressionProps(final String name, final String dataType, final String logicType) {
         this.name = name;
         this.dataType = dataType;
         this.logicType = logicType;
-        Js.asPropertyMap(this).set("name", name);
-        Js.asPropertyMap(this).set("dataType", dataType);
-        Js.asPropertyMap(this).set("logicType", logicType);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public String getLogicType() {
-        return logicType;
     }
 }
