@@ -128,6 +128,10 @@ public class ReactPanel extends Composite {
         refreshFormPropertiesEvent.fire(new RefreshFormPropertiesEvent(sessionManager.getCurrentSession(), nodeUUID));
     }
 
+    public void resetExpressionDefinition() {
+        hasExpression.setExpression(null);
+    }
+
     public void broadcastLiteralExpressionDefinition(final LiteralExpressionProps literalExpressionProps) {
         final HasName hasName = (HasName) hasExpression;
         final QName typeRef = BuiltInTypeUtils.findBuiltInTypeByName(literalExpressionProps.dataType).orElse(BuiltInType.UNDEFINED).asQName();
