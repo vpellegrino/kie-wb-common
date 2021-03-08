@@ -26,11 +26,18 @@ public class BoxedExpressionService {
 
     public static void registerBroadcastForExpression(final ReactPanel reactPanel) {
         createNamespace();
+        registerResetExpressionDefinition(reactPanel);
         registerBroadcastForLiteralExpression(reactPanel);
     }
 
     private static native void createNamespace()/*-{
         $wnd["beeApi"] = {};
+    }-*/;
+
+    private static native void registerResetExpressionDefinition(final ReactPanel reactPanel)/*-{
+        $wnd["beeApi"].resetExpressionDefinition = function() {
+            return reactPanel.@ReactPanel::resetExpressionDefinition(*)();
+        };
     }-*/;
 
     private static native void registerBroadcastForLiteralExpression(final ReactPanel reactPanel)/*-{
