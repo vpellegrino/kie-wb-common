@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.reactpoc;
+package org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props;
 
-import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
-@JsType(isNative = true)
-public class ExternalObject {
-    @JsProperty(name = "name")
-    public native String getName();
+@JsType
+public class LiteralExpressionProps extends ExpressionProps{
+    public final String content;
 
-    @JsProperty(name = "name")
-    public final native void setName(String name);
+    public LiteralExpressionProps(final String name, final String dataType, final String content) {
+        super(name, dataType, "Literal expression");
+        this.content = content;
+    }
 }

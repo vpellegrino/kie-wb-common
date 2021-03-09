@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.reactpoc;
+package org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props;
 
 import jsinterop.annotations.JsType;
-import jsinterop.base.Js;
 
 @JsType
-public class InputProperty {
+public class RelationProps extends ExpressionProps{
+    public final Column[] columns;
+    public final String[][] rows;
 
-    private final String name;
-
-    public InputProperty(final String name) {
-        this.name = name;
-        Js.asPropertyMap(this).set("name", name);
-    }
-
-    public String getName() {
-        return name;
+    public RelationProps(final String name, final String dataType, final Column[] columns, final String[][] rows) {
+        super(name, dataType, "Relation");
+        this.columns = columns;
+        this.rows = rows;
     }
 }

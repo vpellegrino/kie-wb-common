@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.reactpoc;
+package org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,15 +50,15 @@ import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.api.property.dmn.QName;
 import org.kie.workbench.common.dmn.api.property.dmn.Text;
 import org.kie.workbench.common.dmn.api.property.dmn.types.BuiltInType;
-import org.kie.workbench.common.dmn.client.reactpoc.expression.props.Column;
-import org.kie.workbench.common.dmn.client.reactpoc.expression.props.ExpressionProps;
-import org.kie.workbench.common.dmn.client.reactpoc.expression.props.LiteralExpressionProps;
-import org.kie.workbench.common.dmn.client.reactpoc.expression.props.RelationProps;
+import org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props.Column;
+import org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props.ExpressionProps;
+import org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props.LiteralExpressionProps;
+import org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props.RelationProps;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.forms.client.event.RefreshFormPropertiesEvent;
 
 @ApplicationScoped
-public class ReactPanel extends Composite {
+public class BoxedExpressionEditorPanel extends Composite {
     private static HasExpression hasExpression;
 
     private SessionManager sessionManager;
@@ -66,16 +66,16 @@ public class ReactPanel extends Composite {
 
     private String containerId;
 
-    interface ViewBinder extends UiBinder<Widget, ReactPanel> {
+    interface ViewBinder extends UiBinder<Widget, BoxedExpressionEditorPanel> {
 
     }
 
     @SuppressWarnings("unused")
-    public ReactPanel() {
+    public BoxedExpressionEditorPanel() {
         //empty constructor for injection
     }
 
-    public ReactPanel(final SessionManager sessionManager, final Event<RefreshFormPropertiesEvent> refreshFormPropertiesEvent) {
+    public BoxedExpressionEditorPanel(final SessionManager sessionManager, final Event<RefreshFormPropertiesEvent> refreshFormPropertiesEvent) {
         this.sessionManager = sessionManager;
         this.refreshFormPropertiesEvent = refreshFormPropertiesEvent;
     }
@@ -133,7 +133,7 @@ public class ReactPanel extends Composite {
     }
 
     public void setExpression(final String nodeUUID, final HasExpression hasExpression) {
-        ReactPanel.hasExpression = hasExpression;
+        BoxedExpressionEditorPanel.hasExpression = hasExpression;
         refreshFormPropertiesEvent.fire(new RefreshFormPropertiesEvent(sessionManager.getCurrentSession(), nodeUUID));
     }
 

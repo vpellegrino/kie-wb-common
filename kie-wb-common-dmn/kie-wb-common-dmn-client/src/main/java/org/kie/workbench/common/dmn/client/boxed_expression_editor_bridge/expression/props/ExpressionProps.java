@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.reactpoc.expression.props;
+package org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.expression.props;
 
 import jsinterop.annotations.JsType;
 
 @JsType
-public class Column {
-    public final String name;
-    public final String dataType;
-    public final Double width;
+public class ExpressionProps {
 
-    public Column(final String name, final String dataType, final Double width) {
+    public final String name;
+
+    public final String dataType;
+
+    public final String logicType;
+
+    public ExpressionProps(final String name, final String dataType, final String logicType) {
         this.name = name;
         this.dataType = dataType;
-        this.width = width;
+        this.logicType = logicType;
     }
 }
