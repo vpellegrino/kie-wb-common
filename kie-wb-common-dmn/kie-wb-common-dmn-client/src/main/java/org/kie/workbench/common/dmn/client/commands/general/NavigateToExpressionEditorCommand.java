@@ -73,8 +73,8 @@ public class NavigateToExpressionEditorCommand extends BaseNavigateCommand imple
             public CommandResult<CanvasViolation> execute(final AbstractCanvasHandler context) {
                 enableHandlers(false);
                 hidePaletteWidget(true);
-                reactPanel.setExpression(nodeUUID,
-                                         hasExpression);
+                boxedExpressionEditorPanel.setExpression(nodeUUID,
+                                                         hasExpression);
                 editor.setExpression(nodeUUID,
                                      hasExpression,
                                      hasName,

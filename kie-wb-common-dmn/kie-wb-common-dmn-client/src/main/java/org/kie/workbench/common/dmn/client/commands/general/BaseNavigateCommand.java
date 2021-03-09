@@ -25,8 +25,8 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
+import org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.BoxedExpressionEditorPanel;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
-import org.kie.workbench.common.dmn.client.reactpoc.ReactPanel;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.AbstractSessionPresenter;
@@ -44,7 +44,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
 
     static final NoOperationGraphCommand NOP_GRAPH_COMMAND = new NoOperationGraphCommand();
 
-    protected final ReactPanel reactPanel;
+    protected final BoxedExpressionEditorPanel boxedExpressionEditorPanel;
     protected final ExpressionEditorView.Presenter editor;
     protected final SessionPresenter<? extends ClientSession, ?, Diagram> presenter;
     protected final SessionManager sessionManager;
@@ -66,7 +66,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
                                final Optional<HasName> hasName,
                                final boolean isOnlyVisualChangeAllowed) {
         this.editor = editor;
-        this.reactPanel = new ReactPanel(sessionManager, refreshFormPropertiesEvent);
+        this.boxedExpressionEditorPanel = new BoxedExpressionEditorPanel(sessionManager, refreshFormPropertiesEvent);
         this.presenter = presenter;
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
@@ -133,7 +133,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
     // Wrap the editor in a ResizeFlowPanel to support RequiresResize.
     protected ResizeFlowPanel wrapElementForErrai1090() {
         final String containerId = "dmn-expression-editor-container";
-        reactPanel.setContainerId(containerId);
+        boxedExpressionEditorPanel.setContainerId(containerId);
         final ResizeFlowPanel container = new ResizeFlowPanel() {
 
             @Override
@@ -148,7 +148,7 @@ public abstract class BaseNavigateCommand extends AbstractCanvasGraphCommand {
         container.getElement().getStyle().setHeight(100.0, Style.Unit.PCT);
         container.getElement().getStyle().setPadding(10, Style.Unit.PX);
         container.getElement().getStyle().setOverflow(Style.Overflow.AUTO);
-        container.add(reactPanel);
+        container.add(boxedExpressionEditorPanel);
 
         return container;
     }
