@@ -28,6 +28,7 @@ public class BoxedExpressionService {
         createNamespace();
         registerResetExpressionDefinition(reactPanel);
         registerBroadcastForLiteralExpression(reactPanel);
+        registerBroadcastForRelationExpression(reactPanel);
     }
 
     private static native void createNamespace()/*-{
@@ -43,6 +44,12 @@ public class BoxedExpressionService {
     private static native void registerBroadcastForLiteralExpression(final ReactPanel reactPanel)/*-{
         $wnd["beeApi"].broadcastLiteralExpressionDefinition = function(literalExpressionDefinition) {
             return reactPanel.@ReactPanel::broadcastLiteralExpressionDefinition(*)(literalExpressionDefinition);
+        };
+    }-*/;
+
+    private static native void registerBroadcastForRelationExpression(final ReactPanel reactPanel)/*-{
+        $wnd["beeApi"].broadcastRelationExpressionDefinition = function(relationExpressionDefinition) {
+            return reactPanel.@ReactPanel::broadcastRelationExpressionDefinition(*)(relationExpressionDefinition);
         };
     }-*/;
 }
