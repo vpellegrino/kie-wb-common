@@ -16,6 +16,11 @@
 
 package org.kie.workbench.common.dmn.client.reactpoc;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 
@@ -33,6 +38,7 @@ import org.kie.workbench.common.dmn.api.definition.model.Context;
 import org.kie.workbench.common.dmn.api.definition.model.DecisionTable;
 import org.kie.workbench.common.dmn.api.definition.model.Expression;
 import org.kie.workbench.common.dmn.api.definition.model.FunctionDefinition;
+import org.kie.workbench.common.dmn.api.definition.model.InformationItem;
 import org.kie.workbench.common.dmn.api.definition.model.InformationItemPrimary;
 import org.kie.workbench.common.dmn.api.definition.model.Invocation;
 import org.kie.workbench.common.dmn.api.definition.model.IsLiteralExpression;
@@ -44,19 +50,21 @@ import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.api.property.dmn.QName;
 import org.kie.workbench.common.dmn.api.property.dmn.Text;
 import org.kie.workbench.common.dmn.api.property.dmn.types.BuiltInType;
+import org.kie.workbench.common.dmn.client.reactpoc.expression.props.Column;
 import org.kie.workbench.common.dmn.client.reactpoc.expression.props.ExpressionProps;
 import org.kie.workbench.common.dmn.client.reactpoc.expression.props.LiteralExpressionProps;
+import org.kie.workbench.common.dmn.client.reactpoc.expression.props.RelationProps;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.forms.client.event.RefreshFormPropertiesEvent;
 
 @ApplicationScoped
 public class ReactPanel extends Composite {
+    private static HasExpression hasExpression;
 
     private SessionManager sessionManager;
     private Event<RefreshFormPropertiesEvent> refreshFormPropertiesEvent;
 
     private String containerId;
-    private HasExpression hasExpression;
 
     interface ViewBinder extends UiBinder<Widget, ReactPanel> {
 
@@ -96,7 +104,7 @@ public class ReactPanel extends Composite {
         }
         if (hasExpression instanceof HasVariable) {
             @SuppressWarnings("unchecked")
-            HasVariable<InformationItemPrimary> hasVariable = (HasVariable<InformationItemPrimary>) hasExpression;
+            final HasVariable<InformationItemPrimary> hasVariable = (HasVariable<InformationItemPrimary>) hasExpression;
             dataType = hasVariable.getVariable().getTypeRef().getLocalPart();
         }
         ExpressionProps expressionProps = new ExpressionProps(expressionName, dataType, null);
@@ -108,7 +116,8 @@ public class ReactPanel extends Composite {
             } else if (wrappedExpression instanceof Context) {
 
             } else if (wrappedExpression instanceof Relation) {
-
+                final Relation relationExpression = (Relation) wrappedExpression;
+                expressionProps = new RelationProps(expressionName, dataType, columnsConvertForRelationProps(relationExpression), rowsConvertForRelationProps(relationExpression));
             } else if (wrappedExpression instanceof List) {
 
             } else if (wrappedExpression instanceof Invocation) {
@@ -124,7 +133,7 @@ public class ReactPanel extends Composite {
     }
 
     public void setExpression(final String nodeUUID, final HasExpression hasExpression) {
-        this.hasExpression = hasExpression;
+        ReactPanel.hasExpression = hasExpression;
         refreshFormPropertiesEvent.fire(new RefreshFormPropertiesEvent(sessionManager.getCurrentSession(), nodeUUID));
     }
 
@@ -134,8 +143,11 @@ public class ReactPanel extends Composite {
 
     public void broadcastLiteralExpressionDefinition(final LiteralExpressionProps literalExpressionProps) {
         final HasName hasName = (HasName) hasExpression;
-        final QName typeRef = BuiltInTypeUtils.findBuiltInTypeByName(literalExpressionProps.dataType).orElse(BuiltInType.UNDEFINED).asQName();
         hasName.setName(new Name(literalExpressionProps.name));
+        final QName typeRef = BuiltInTypeUtils
+                .findBuiltInTypeByName(literalExpressionProps.dataType)
+                .orElse(BuiltInType.UNDEFINED)
+                .asQName();
         if (hasExpression instanceof HasVariable) {
             @SuppressWarnings("unchecked")
             HasVariable<InformationItemPrimary> hasVariable = (HasVariable<InformationItemPrimary>) hasExpression;
@@ -147,5 +159,70 @@ public class ReactPanel extends Composite {
         final LiteralExpression literalExpression = (LiteralExpression) hasExpression.getExpression();
         literalExpression.setText(new Text(literalExpressionProps.content));
         literalExpression.setTypeRef(typeRef);
+    }
+
+    public void broadcastRelationExpressionDefinition(final RelationProps relationProps) {
+        if (hasExpression.getExpression() == null) {
+            hasExpression.setExpression(new Relation());
+        }
+        final Relation relationExpression = (Relation) hasExpression.getExpression();
+        relationExpression.getColumn().clear();
+        relationExpression.getColumn().addAll(columnsConvertForRelationExpression(relationProps));
+        relationExpression.getRow().clear();
+        relationExpression.getRow().addAll(rowsConvertForRelationExpression(relationProps, relationExpression));
+    }
+
+    private Collection<List> rowsConvertForRelationExpression(final RelationProps relationProps, final Relation relationExpression) {
+        return Arrays
+                .stream(relationProps.rows)
+                .map(row -> {
+                    final List list = new List();
+                    list.getExpression().addAll(
+                            Arrays.stream(row).map(cell -> {
+                                final LiteralExpression wrappedExpression = new LiteralExpression();
+                                wrappedExpression.setText(new Text(cell));
+                                wrappedExpression.setTypeRef(BuiltInType.STRING.asQName());
+                                return HasExpression.wrap(relationExpression, wrappedExpression);
+                            }).collect(Collectors.toList())
+                    );
+                    return list;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Collection<InformationItem> columnsConvertForRelationExpression(final RelationProps relationProps) {
+        return Stream
+                .of(relationProps.columns)
+                .map(column -> {
+                    final InformationItem informationItem = new InformationItem();
+                    informationItem.setName(new Name(column.name));
+                    informationItem.setTypeRef(BuiltInTypeUtils
+                                                       .findBuiltInTypeByName(column.dataType)
+                                                       .orElse(BuiltInType.UNDEFINED)
+                                                       .asQName());
+                    return informationItem;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Column[] columnsConvertForRelationProps(final Relation relationExpression) {
+        return relationExpression
+                .getColumn()
+                .stream()
+                .map(informationItem -> new Column(informationItem.getName().getValue(), informationItem.getTypeRef().getLocalPart(), null))
+                .toArray(Column[]::new);
+    }
+
+    private String[][] rowsConvertForRelationProps(final Relation relationExpression) {
+        return relationExpression
+                .getRow()
+                .stream()
+                .map(list -> list
+                        .getExpression()
+                        .stream()
+                        .map(wrappedLiteralExpression -> ((LiteralExpression) wrappedLiteralExpression.getExpression()).getText().getValue())
+                        .toArray(String[]::new)
+                )
+                .toArray(String[][]::new);
     }
 }
