@@ -28,6 +28,7 @@ public class BoxedExpressionService {
         createNamespace();
         registerResetExpressionDefinition(boxedExpressionEditorPanel);
         registerBroadcastForLiteralExpression(boxedExpressionEditorPanel);
+        registerBroadcastForContextExpression(boxedExpressionEditorPanel);
         registerBroadcastForRelationExpression(boxedExpressionEditorPanel);
     }
 
@@ -37,19 +38,25 @@ public class BoxedExpressionService {
 
     private static native void registerResetExpressionDefinition(final BoxedExpressionEditorPanel boxedExpressionEditorPanel)/*-{
         $wnd["beeApi"].resetExpressionDefinition = function() {
-            return boxedExpressionEditorPanel.@org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.BoxedExpressionEditorPanel::resetExpressionDefinition(*)();
+            return boxedExpressionEditorPanel.@BoxedExpressionEditorPanel::resetExpressionDefinition(*)();
         };
     }-*/;
 
     private static native void registerBroadcastForLiteralExpression(final BoxedExpressionEditorPanel boxedExpressionEditorPanel)/*-{
         $wnd["beeApi"].broadcastLiteralExpressionDefinition = function(literalExpressionDefinition) {
-            return boxedExpressionEditorPanel.@org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.BoxedExpressionEditorPanel::broadcastLiteralExpressionDefinition(*)(literalExpressionDefinition);
+            return boxedExpressionEditorPanel.@BoxedExpressionEditorPanel::broadcastLiteralExpressionDefinition(*)(literalExpressionDefinition);
+        };
+    }-*/;
+
+    private static native void registerBroadcastForContextExpression(final BoxedExpressionEditorPanel boxedExpressionEditorPanel)/*-{
+        $wnd["beeApi"].broadcastContextExpressionDefinition = function(contextExpressionDefinition) {
+            return boxedExpressionEditorPanel.@BoxedExpressionEditorPanel::broadcastContextExpressionDefinition(*)(contextExpressionDefinition);
         };
     }-*/;
 
     private static native void registerBroadcastForRelationExpression(final BoxedExpressionEditorPanel boxedExpressionEditorPanel)/*-{
         $wnd["beeApi"].broadcastRelationExpressionDefinition = function(relationExpressionDefinition) {
-            return boxedExpressionEditorPanel.@org.kie.workbench.common.dmn.client.boxed_expression_editor_bridge.BoxedExpressionEditorPanel::broadcastRelationExpressionDefinition(*)(relationExpressionDefinition);
+            return boxedExpressionEditorPanel.@BoxedExpressionEditorPanel::broadcastRelationExpressionDefinition(*)(relationExpressionDefinition);
         };
     }-*/;
 }
