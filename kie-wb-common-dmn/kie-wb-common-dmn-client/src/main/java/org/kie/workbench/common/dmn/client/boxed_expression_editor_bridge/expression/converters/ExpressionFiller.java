@@ -90,10 +90,11 @@ public class ExpressionFiller {
         final ContextEntry resultContextEntry = !contextExpression.getContextEntry().isEmpty() ?
                 contextExpression.getContextEntry().get(contextExpression.getContextEntry().size() - 1) :
                 new ContextEntry();
+        final InformationItem variable = Optional.ofNullable(resultContextEntry.getVariable()).orElse(new InformationItem());
         return buildAndFillJsInteropProp(
                 resultContextEntry.getExpression(),
-                resultContextEntry.getVariable().getName().getValue(),
-                resultContextEntry.getVariable().getTypeRef().getLocalPart()
+                variable.getName().getValue(),
+                variable.getTypeRef().getLocalPart()
         );
     }
 
