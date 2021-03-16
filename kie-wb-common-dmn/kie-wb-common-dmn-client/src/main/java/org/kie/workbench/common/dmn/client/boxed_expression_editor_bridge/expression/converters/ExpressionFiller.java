@@ -149,13 +149,6 @@ public class ExpressionFiller {
     private static ContextEntry entryResultConvertForContextExpression(final ContextProps contextProps) {
         final ContextEntry contextEntryResult = new ContextEntry();
         if (contextProps.result != null) {
-            final InformationItem informationItem = new InformationItem();
-            informationItem.setName(new Name(contextProps.result.name));
-            informationItem.setTypeRef(BuiltInTypeUtils
-                                               .findBuiltInTypeByName(contextProps.result.dataType)
-                                               .orElse(BuiltInType.UNDEFINED)
-                                               .asQName());
-            contextEntryResult.setVariable(informationItem);
             contextEntryResult.setExpression(buildAndFillNestedExpression(contextProps.result));
         }
         return contextEntryResult;
