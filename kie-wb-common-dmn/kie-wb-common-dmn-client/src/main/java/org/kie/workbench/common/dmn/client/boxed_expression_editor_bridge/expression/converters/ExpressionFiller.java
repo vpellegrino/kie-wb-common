@@ -90,12 +90,7 @@ public class ExpressionFiller {
         final ContextEntry resultContextEntry = !contextExpression.getContextEntry().isEmpty() ?
                 contextExpression.getContextEntry().get(contextExpression.getContextEntry().size() - 1) :
                 new ContextEntry();
-        final InformationItem variable = Optional.ofNullable(resultContextEntry.getVariable()).orElse(new InformationItem());
-        return buildAndFillJsInteropProp(
-                resultContextEntry.getExpression(),
-                variable.getName().getValue(),
-                variable.getTypeRef().getLocalPart()
-        );
+        return buildAndFillJsInteropProp(resultContextEntry.getExpression(), "Result Expression", "<Undefined>");
     }
 
     private static ContextEntryProps[] contextEntriesConvertForContextProps(final Context contextExpression) {
