@@ -27,8 +27,6 @@ import { DataType, EntryInfo, FunctionKind, FunctionProps, LogicType } from "../
 import { act } from "react-dom/test-utils";
 import * as _ from "lodash";
 
-jest.useFakeTimers();
-
 describe("FunctionExpression tests", () => {
   test("should show a table with two levels visible header, with one row and one column", () => {
     const { container } = render(
@@ -82,6 +80,7 @@ describe("FunctionExpression tests", () => {
       functionKind: "FEEL",
       logicType: "Function",
       name: "p-1",
+      parametersWidth: 370,
       uid: undefined,
     });
   });
@@ -242,6 +241,7 @@ describe("FunctionExpression tests", () => {
         functionKind: "FEEL",
         logicType: "Function",
         name: "p-1",
+        parametersWidth: 370,
         uid: undefined,
       });
     }
@@ -375,4 +375,24 @@ describe("FunctionExpression tests", () => {
       await jest.runAllTimers();
     });
   }
+});
+
+jest.useFakeTimers();
+
+jest.mock("react", () => {
+  const actualReact = jest.requireActual("react");
+
+  function useContext<T>(context: React.Context<T>) {
+    return {
+      ...actualReact.useContext(context),
+      ...{
+        setSupervisorHash: (hash: number) => hash,
+      },
+    };
+  }
+
+  return {
+    ...actualReact,
+    useContext: useContext,
+  };
 });

@@ -22,8 +22,6 @@ import * as React from "react";
 import { LogicTypeSelector } from "../../../components/LogicTypeSelector";
 import * as _ from "lodash";
 
-jest.useFakeTimers();
-
 describe("LogicTypeSelector tests", () => {
   test("should have the clear action disabled on startup", async () => {
     const expression = { name: "Test", dataType: DataType.Undefined };
@@ -121,3 +119,23 @@ const triggerContextMenu = async (container: HTMLElement, selector: string) => {
     jest.runAllTimers();
   });
 };
+
+jest.useFakeTimers();
+
+jest.mock("react", () => {
+  const actualReact = jest.requireActual("react");
+
+  function useContext<T>(context: React.Context<T>) {
+    return {
+      ...actualReact.useContext(context),
+      ...{
+        setSupervisorHash: (hash: number) => hash,
+      },
+    };
+  }
+
+  return {
+    ...actualReact,
+    useContext: useContext,
+  };
+});

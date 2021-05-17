@@ -26,11 +26,6 @@ import { ContextExpression } from "../../../components/ContextExpression";
 import * as React from "react";
 import { DataType, LogicType } from "../../../api";
 
-jest.mock("../../../api", () => ({
-  ...(jest.requireActual("../../../api") as Record<string, unknown>),
-  getHandlerConfiguration: jest.fn(),
-}));
-
 describe("ContextExpression tests", () => {
   const name = "contextName";
   const dataType = DataType.Boolean;
@@ -108,4 +103,27 @@ describe("ContextExpression tests", () => {
     checkEntryStyle(contextEntry(container, 2), "logic-type-not-present");
     checkEntryStyle(contextEntry(container, 3), "logic-type-not-present");
   });
+});
+
+jest.mock("../../../api", () => ({
+  ...(jest.requireActual("../../../api") as Record<string, unknown>),
+  getHandlerConfiguration: jest.fn(),
+}));
+
+jest.mock("react", () => {
+  const actualReact = jest.requireActual("react");
+
+  function useContext<T>(context: React.Context<T>) {
+    return {
+      ...actualReact.useContext(context),
+      ...{
+        setSupervisorHash: (hash: number) => hash,
+      },
+    };
+  }
+
+  return {
+    ...actualReact,
+    useContext: useContext,
+  };
 });

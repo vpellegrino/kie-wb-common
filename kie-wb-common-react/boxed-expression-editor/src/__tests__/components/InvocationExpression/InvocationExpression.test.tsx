@@ -20,11 +20,6 @@ import { DataType, LogicType } from "../../../api";
 import * as React from "react";
 import { InvocationExpression } from "../../../components/InvocationExpression";
 
-jest.mock("../../../api", () => ({
-  ...(jest.requireActual("../../../api") as Record<string, unknown>),
-  getHandlerConfiguration: jest.fn(),
-}));
-
 describe("InvocationExpression tests", () => {
   test("should show a table with two levels visible header, with one row and two columns", () => {
     const { container } = render(
@@ -96,4 +91,27 @@ describe("InvocationExpression tests", () => {
     checkEntryContent(contextEntry(container, 1), firstEntry.entryInfo);
     checkEntryContent(contextEntry(container, 2), secondEntry.entryInfo);
   });
+});
+
+jest.mock("../../../api", () => ({
+  ...(jest.requireActual("../../../api") as Record<string, unknown>),
+  getHandlerConfiguration: jest.fn(),
+}));
+
+jest.mock("react", () => {
+  const actualReact = jest.requireActual("react");
+
+  function useContext<T>(context: React.Context<T>) {
+    return {
+      ...actualReact.useContext(context),
+      ...{
+        setSupervisorHash: (hash: number) => hash,
+      },
+    };
+  }
+
+  return {
+    ...actualReact,
+    useContext: useContext,
+  };
 });
