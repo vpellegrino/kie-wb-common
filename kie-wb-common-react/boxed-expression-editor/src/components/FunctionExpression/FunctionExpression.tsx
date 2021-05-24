@@ -229,6 +229,34 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
   const [selectedFunctionKind, setSelectedFunctionKind] = useState(functionKind);
   const [rows, setRows] = useState(evaluateRows(selectedFunctionKind));
 
+  const retrieveModelValue = useCallback(
+    (documentValue: string, contextProps: ContextProps) =>
+      documentValue === document.current
+        ? _.includes(
+            (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.getOptions(),
+            (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.selected
+          )
+          ? (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.selected
+          : ""
+        : "",
+    []
+  );
+
+  const setParametersBasedOnDocumentAndModel = useCallback(
+    (documentHasBeenChanged: boolean, modelHasBeenChanged: boolean) => {
+      if (documentHasBeenChanged) {
+        setParameters([]);
+      }
+      if (modelHasBeenChanged) {
+        const parametersFromPmmlProps = extractParametersFromPmmlProps(props as PmmlFunctionProps);
+        if (!_.isEmpty(parametersFromPmmlProps)) {
+          setParameters(parametersFromPmmlProps);
+        }
+      }
+    },
+    [extractParametersFromPmmlProps, props]
+  );
+
   const extendDefinitionBasedOnFunctionKind = useCallback(
     (definition: FunctionProps, functionKind: FunctionKind) => {
       switch (functionKind) {
@@ -244,28 +272,12 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
           const contextProps = _.first(rows)?.entryExpression as ContextProps;
           const documentValue =
             (_.nth(contextProps.contextEntries, 0)?.entryExpression as PMMLLiteralExpressionProps)?.selected || "";
-          const modelValue =
-            documentValue === document.current
-              ? _.includes(
-                  (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.getOptions(),
-                  (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.selected
-                )
-                ? (_.nth(contextProps.contextEntries, 1)?.entryExpression as PMMLLiteralExpressionProps)?.selected
-                : ""
-              : "";
+          const modelValue = retrieveModelValue(documentValue, contextProps);
           const documentHasBeenChanged = documentValue !== document.current;
           const modelHasBeenChanged = modelValue !== model.current;
           document.current = documentValue;
           model.current = modelValue;
-          if (documentHasBeenChanged) {
-            setParameters([]);
-          }
-          if (modelHasBeenChanged) {
-            const parametersFromPmmlProps = extractParametersFromPmmlProps(props as PmmlFunctionProps);
-            if (!_.isEmpty(parametersFromPmmlProps)) {
-              setParameters(parametersFromPmmlProps);
-            }
-          }
+          setParametersBasedOnDocumentAndModel(documentHasBeenChanged, modelHasBeenChanged);
           return _.extend(definition, { document: documentValue, model: modelValue });
         }
         case FunctionKind.Feel:
@@ -274,7 +286,7 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
         }
       }
     },
-    [extractParametersFromPmmlProps, props, rows]
+    [retrieveModelValue, rows, setParametersBasedOnDocumentAndModel]
   );
 
   const spreadFunctionExpressionDefinition = useCallback(() => {
